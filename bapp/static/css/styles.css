@@ -47,3 +47,27 @@ body {
   background-color: var(--selected);
   color: white;
 }
+
+.custom-card {
+  border-radius: 16px;
+  transition: 0.2s;
+  display: flex;
+  flex-direction: column;
+}
+
+.custom-card:hover {
+  transform: translateY(-5px);
+}
+
+.custom-btn {
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+.bg-success-subtle {
+  background-color: #b8e6d5 !important;
+}
+
+.bg-secondary-subtle {
+  background-color: #e2e8f0 !important;
+}

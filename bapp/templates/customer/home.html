@@ -4,127 +4,68 @@
 
 {% block content %}
 <div class="container py-4">
-  <div class="mb-4">
-    <h2 class="mb-1">Find Your Field</h2>
-    <p class="text-muted">Book your favorite sports field in just a few clicks</p>
-  </div>
+    {% include 'customer/components/filter_bar.html' %}
 
-  <div class="mb-4">
-    <div class="mb-3 position-relative">
-      <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
-      <input type="text" id="searchInput" class="form-control ps-5 py-2" placeholder="Search fields...">
+    <div class="row g-4">
+        {% for court in courts %}
+        {% include 'customer/components/court_card.html' %}
+        {% endfor %}
     </div>
 
-    <div class="d-flex flex-wrap gap-2 align-items-center">
-      <div class="d-flex flex-wrap gap-2" id="sportFilter">
-        <button class="btn btn-primary active" data-sport="all">All Sports</button>
-        <button class="btn btn-light" data-sport="football">⚽ Football</button>
-        <button class="btn btn-light" data-sport="badminton">🏸 Badminton</button>
-        <button class="btn btn-light" data-sport="tennis">🎾 Tennis</button>
-      </div>
-
-      <div class="ms-auto">
-        <input type="date" id="dateInput" class="form-control" value="{{ current_date }}">
-      </div>
+    <div id="emptyState" class="text-center py-5 d-none">
+        <div style="font-size:50px;">🔍</div>
+        <h4>No courts found</h4>
+        <p class="text-muted">Try adjusting your filters</p>
     </div>
-  </div>
-
-  <div class="row g-4" id="fieldContainer">
-    {% for field in fields %}
-    <div class="col-md-6 col-lg-4 field-item" data-name="{{ field.name | lower }}" data-sport="{{ field.sport }}">
-      <div class="card h-100 shadow-sm">
-        <div class="d-flex align-items-center justify-content-center rounded-3 mb-3"
-             style="height:120px;
-             background:
-             {% if field.sport == 'football' %}#b8d4f1
-             {% elif field.sport == 'badminton' %}#b8e6d5
-             {% else %}#d4b8e6{% endif %};">
-
-          <div style="font-size:40px;">
-            {% if field.sport == 'football' %}⚽
-            {% elif field.sport == 'badminton' %}🏸
-            {% else %}🎾{% endif %}
-          </div>
-        </div>
-          <div class="card-body d-flex flex-column">
-
-          <div class="d-flex justify-content-between mb-2">
-            <h5 class="mb-0">{{ field.name }}</h5>
-            <span class="badge bg-success">Available</span>
-          </div>
-
-          <p class="text-muted small mb-3">
-            <i class="bi bi-geo-alt"></i>
-            {{ field.sport }}
-          </p>
-
-          <a href="/booking/{{ field.id }}?date={{ current_date }}"
-             class="btn btn-primary mt-auto">
-            Book Now
-          </a>
-
-        </div>
-      </div>
-    </div>
-    {% endfor %}
-
-  </div>
-
-  <div id="emptyState" class="text-center py-5 d-none">
-    <div style="font-size:50px;">🔍</div>
-    <h4>No fields found</h4>
-    <p class="text-muted">Try adjusting your filters</p>
-  </div>
 
 </div>
 
 <script>
-let selectedSport = "all";
+    let selectedSport = "all";
 
-const searchInput = document.getElementById("searchInput");
-const sportButtons = document.querySelectorAll("#sportFilter button");
-const fieldItems = document.querySelectorAll(".field-item");
-const emptyState = document.getElementById("emptyState");
+    const searchInput = document.getElementById("searchInput");
+    const sportButtons = document.querySelectorAll("#sportFilter button");
+    const courtItems = document.querySelectorAll(".court-item");
+    const emptyState = document.getElementById("emptyState");
 
-// Search + filter logic
-function filterFields() {
-  const search = searchInput.value.toLowerCase();
-  let visibleCount = 0;
+    function filterCourts() {
+      const search = searchInput.value.toLowerCase();
+      let visibleCount = 0;
 
-  fieldItems.forEach(item => {
-    const name = item.dataset.name;
-    const sport = item.dataset.sport;
+      courtItems.forEach(item => {
+        const name = item.dataset.name;
+        const sport = item.dataset.sport;
 
-    const matchSearch = name.includes(search);
-    const matchSport = selectedSport === "all" || sport === selectedSport;
+        const matchSearch = name.includes(search);
+        const matchSport = selectedSport === "all" || sport === selectedSport;
 
-    if (matchSearch && matchSport) {
-      item.style.display = "block";
-      visibleCount++;
-    } else {
-      item.style.display = "none";
+        if (matchSearch && matchSport) {
+          item.style.display = "";
+          visibleCount++;
+        } else {
+          item.style.display = "none";
+        }
+      });
+
+      emptyState.classList.toggle("d-none", visibleCount !== 0);
     }
-  });
 
-  emptyState.classList.toggle("d-none", visibleCount !== 0);
-}
+    // Search event
+    searchInput.addEventListener("input", filterCourts);
 
-// Search event
-searchInput.addEventListener("input", filterFields);
+    // Sport filter
+    sportButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        sportButtons.forEach(b => b.classList.remove("btn-primary", "active"));
+        sportButtons.forEach(b => b.classList.add("btn-light"));
 
-// Sport filter
-sportButtons.forEach(btn => {
-  btn.addEventListener("click", () => {
-    sportButtons.forEach(b => b.classList.remove("btn-primary", "active"));
-    sportButtons.forEach(b => b.classList.add("btn-light"));
+        btn.classList.remove("btn-light");
+        btn.classList.add("btn-primary", "active");
 
-    btn.classList.remove("btn-light");
-    btn.classList.add("btn-primary", "active");
-
-    selectedSport = btn.dataset.sport;
-    filterFields();
-  });
-});
+        selectedSport = btn.dataset.sport;
+        filterCourts();
+      });
+    });
 </script>
 
 {% endblock %}
