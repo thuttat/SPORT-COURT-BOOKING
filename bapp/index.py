@@ -5,6 +5,7 @@ from flask_login import login_user, login_required, logout_user
 import cloudinary.uploader
 from bapp import app, dao
 from bapp.decorators import loggedin
+from bapp.models import UserRole
 
 
 @app.route('/login', methods=['get', 'post'])
@@ -45,11 +46,15 @@ def register_user():
                 res = cloudinary.uploader.upload(avatar)
                 avatar_path = res['secure_url']
 
+            role = request.form.get('user_role')
+            role_enum = UserRole.ADMIN if role == 'ADMIN' else UserRole.USER
+
             dao.add_user(fullname=request.form.get('fullname'),
                          username=request.form.get('username'),
                          password=password,
                          email=request.form.get('email'),
-                         avatar=avatar_path)
+                         avatar=avatar_path,
+                         user_role=role_enum)
 
             return redirect('/login')
         else:
