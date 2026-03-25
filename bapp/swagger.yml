@@ -1,0 +1,90 @@
+swagger: "2.0"
+
+info:
+  title: "API Hệ thống Quản lý Đặt sân"
+  description: "Tài liệu API Backend cho hệ thống đặt sân thể thao."
+  version: "1.0.0"
+
+paths:
+  # ==========================================
+  # API ĐĂNG NHẬP
+  # ==========================================
+  /login:
+    post:
+      tags:
+        - "Authentication"
+#      summary: "Đăng nhập người dùng"
+      consumes:
+        - "application/x-www-form-urlencoded"
+      parameters:
+        - name: "username"
+          in: "formData"
+          type: "string"
+          required: true
+          description: "Tên đăng nhập"
+
+        - name: "password"
+          in: "formData"
+          type: "string"
+          required: true
+          description: "Mật khẩu"
+
+      responses:
+        200:
+          description: "Đăng nhập thành công"
+        401:
+          description: "Sai thông tin"
+
+  # ==========================================
+  # API ĐĂNG KÝ
+  # ==========================================
+  /register:
+    post:
+      tags:
+        - "Authentication"
+#      summary: "Đăng ký tài khoản mới"
+      consumes:
+        - "multipart/form-data"
+      parameters:
+        - name: "fullname"
+          in: "formData"
+          type: "string"
+          required: true
+          description: "Họ và tên đầy đủ"
+
+        - name: "username"
+          in: "formData"
+          type: "string"
+          required: true
+          description: "Tên đăng nhập"
+
+        - name: "password"
+          in: "formData"
+          type: "string"
+          required: true
+          description: "Mật khẩu"
+
+        - name: "email"
+          in: "formData"
+          type: "string"
+          required: true
+          description: "Email"
+
+        - name: "role"
+          in : "formData"
+          type: "string"
+          required: true
+          description: "Vai trò"
+
+        - name: "avatar"
+          in: "formData"
+          type: "file"
+          required: true
+          description: "Ảnh đại diện"
+
+      responses:
+        201:
+          description: "Đăng ký thành công"
+        400:
+          description: "Lỗi mật khẩu không khớp hoặc trùng lặp"
+

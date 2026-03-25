@@ -1,75 +1,93 @@
 import cloudinary
-from bapp import login_manager, db
-from flask import request, redirect, render_template
-from flask_login import login_user, login_required, logout_user
 import cloudinary.uploader
-from bapp import app, dao
-from bapp.decorators import loggedin
+import re
+from flask import request, jsonify
+from flask_login import login_user, login_required, logout_user
+
+from bapp import app, dao, login_manager, db
 from bapp.models import UserRole
 
 
-@app.route('/login', methods=['get', 'post'])
-@loggedin
+@app.route('/api/login', methods=['POST'])
 def login_my_user():
-    err_msg = ''
-    if request.method.__eq__('POST'):
-        username = request.form.get('username')
-        password = request.form.get('password')
+    username = request.form.get('username')
+    password = request.form.get('password')
 
-        user = dao.auth_user(username=username, password=password)
-        if user:
-            login_user(user)
+    if not username or not password:
+        return jsonify({"status": "error", "message": "Please fill out all required fields"}), 400
 
-            next = request.args.get('next')
-            return redirect(next if next else '/')
-        else:
-            err_msg = 'Username hoặc password không đúng!'
+    user = dao.auth_user(username=username, password=password)
+    if user:
+        login_user(user)
+        return jsonify({
+            "status": "success",
+            "message": "Log in successfully!",
+            "data": {
+                "id": user.id,
+                "username": user.username
+            }
+        }), 200
+    else:
+        return jsonify({"status": "error", "message": "Invalid username or password!"}), 400
 
-    return render_template('login.html', err_msg=err_msg)
 
-@app.route('/logout', methods=['get'])
+@app.route('/api/logout', methods=['POST'])
 def logout_my_user():
     logout_user()
-    return redirect('/login')
+    return jsonify({"status": "success", "message": "Signed out successfully!"}), 200
 
-@app.route('/register', methods=['get', 'post'])
-@loggedin
+
+@app.route('/api/register', methods=['POST'])
 def register_user():
-    err_msg = None
-    if request.method.__eq__('POST'):
-        password = request.form.get('password')
-        confirm = request.form.get('confirm')
-        if password.__eq__(confirm):
-            avatar_path = None
-            avatar = request.files.get('avatar')
-            if avatar:
-                res = cloudinary.uploader.upload(avatar)
-                avatar_path = res['secure_url']
+    fullname = request.form.get('fullname')
+    email = request.form.get('email')
+    email_pattern = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
+    username = request.form.get('username')
+    password = request.form.get('password')
+    confirm = request.form.get('confirm')
+    avatar = request.files.get('avatar')
 
-            role = request.form.get('user_role')
-            role_enum = UserRole.ADMIN if role == 'ADMIN' else UserRole.USER
+    if not fullname or not email or not username or not password or not confirm or not avatar:
+        return jsonify({"status": "error", "message": "Please fill out all required fields!"}), 400
 
-            dao.add_user(fullname=request.form.get('fullname'),
-                         username=request.form.get('username'),
-                         password=password,
-                         email=request.form.get('email'),
-                         avatar=avatar_path,
-                         user_role=role_enum)
+    if password != confirm:
+        return jsonify({"status": "error", "message": "Passwords do not match!"}), 400
 
-            return redirect('/login')
+    if not re.match(email_pattern, email):
+        return jsonify({"status": "error", "message": "Invalid email format!"}), 400
+
+    try:
+        res = cloudinary.uploader.upload(avatar)
+        avatar_path = res['secure_url']
+        role = request.form.get('user_role')
+        if role and role.strip().upper() == 'ADMIN':
+            role_enum = UserRole.ADMIN
         else:
-            err_msg = 'Mật khẩu không khớp!'
-
-    return render_template('register.html', err_msg=err_msg)
+            role_enum = UserRole.USER
+        dao.add_user(
+            fullname=fullname,
+            username=username,
+            password=password,
+            email=email,
+            avatar=avatar_path,
+            user_role=role_enum
+        )
+        return jsonify({
+            "status": "success",
+            "message": "Registered successfully!",
+            "data": {
+                "username": username,
+                "email": email
+            }
+        }), 201
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 400
 
 
 @login_manager.user_loader
 def load_user(user_id):
     return dao.get_user_by_id(user_id)
 
-@app.route('/')
-def index():
-    return render_template('index.html')
 
 if __name__ == '__main__':
     with app.app_context():

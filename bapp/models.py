@@ -24,13 +24,13 @@ class User(BaseModel,UserMixin):
     fullname = Column(String(255), nullable=False)
     email = Column(String(255), nullable=False,unique=True)
     user_role = Column(Enum(UserRole), default=UserRole.USER)
-    avatar=Column(String(255), nullable=True)
+    avatar=Column(String(255), nullable=False)
 
     def __str__(self):
         return self.username
 
 
 if __name__ == '__main__':
-    with bapp.app_context():
+    with bapp.app.app_context():
         db.create_all()
         db.session.commit()
