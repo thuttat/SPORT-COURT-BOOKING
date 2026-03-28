@@ -1,11 +1,49 @@
 import cloudinary
 import cloudinary.uploader
 import re
-from flask import request, jsonify
+import datetime
+from flask import request, jsonify, render_template, redirect
 from flask_login import login_user, login_required, logout_user
-
 from bapp import app, dao, login_manager, db
 from bapp.models import UserRole
+
+
+
+@app.route('/')
+def index():
+    courts = [
+        {"id": "c1", "name": "Sân bóng đá Mini A", "sport": "football", "location": "Quận 1", "price": 200000,
+         "rating": 4.5, "available": True},
+        {"id": "c2", "name": "Sân cầu lông VIP 1", "sport": "badminton", "location": "Quận 3", "price": 80000,
+         "rating": 4.8, "available": True},
+        {"id": "c3", "name": "Sân cầu lông TTTM", "sport": "badminton", "location": "Quận 8", "price": 45000,
+         "rating": 4.9, "available": False},
+        {"id": "c4", "name": "Sân tennis trung tâm", "sport": "tennis", "location": "Quận 7", "price": 300000,
+         "rating": 4.6, "available": True},
+        {"id": "c5", "name": "Sân tennis Hồ Tùng Mậu", "sport": "tennis", "location": "Quận 1", "price": 500000,
+         "rating": 4.7, "available": True}
+    ]
+    return render_template("customer/home.html", courts=courts, current_date=datetime.date.today().strftime("%Y-%m-%d"))
+
+
+@app.route('/login')
+def login_view():
+    return render_template('login.html')
+
+
+@app.route('/register')
+def register_view():
+    return render_template("register.html")
+
+
+@app.route('/bookings')
+def bookings_view():
+    return render_template("customer/bookings.html")
+
+
+@app.route('/profile')
+def profile_view():
+    return render_template("customer/profile.html")
 
 
 @app.route('/api/login', methods=['POST'])
@@ -22,13 +60,9 @@ def login_my_user():
         return jsonify({
             "status": "success",
             "message": "Log in successfully!",
-            "data": {
-                "id": user.id,
-                "username": user.username
-            }
+            "data": {"id": user.id, "username": user.username}
         }), 200
-    else:
-        return jsonify({"status": "error", "message": "Invalid username or password!"}), 400
+    return jsonify({"status": "error", "message": "Invalid username or password!"}), 400
 
 
 @app.route('/api/logout', methods=['POST'])
@@ -37,49 +71,41 @@ def logout_my_user():
     return jsonify({"status": "success", "message": "Signed out successfully!"}), 200
 
 
+@app.route('/logout')
+def logout_process():
+    logout_user()
+    return redirect('/login')
+
+
 @app.route('/api/register', methods=['POST'])
 def register_user():
     fullname = request.form.get('fullname')
     email = request.form.get('email')
-    email_pattern = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
     username = request.form.get('username')
     password = request.form.get('password')
     confirm = request.form.get('confirm')
     avatar = request.files.get('avatar')
 
-    if not fullname or not email or not username or not password or not confirm or not avatar:
+    if not all([fullname, email, username, password, confirm, avatar]):
         return jsonify({"status": "error", "message": "Please fill out all required fields!"}), 400
 
     if password != confirm:
         return jsonify({"status": "error", "message": "Passwords do not match!"}), 400
 
+    email_pattern = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
     if not re.match(email_pattern, email):
         return jsonify({"status": "error", "message": "Invalid email format!"}), 400
 
     try:
         res = cloudinary.uploader.upload(avatar)
         avatar_path = res['secure_url']
-        role = request.form.get('user_role')
-        if role and role.strip().upper() == 'ADMIN':
-            role_enum = UserRole.ADMIN
-        else:
-            role_enum = UserRole.USER
-        dao.add_user(
-            fullname=fullname,
-            username=username,
-            password=password,
-            email=email,
-            avatar=avatar_path,
-            user_role=role_enum
-        )
-        return jsonify({
-            "status": "success",
-            "message": "Registered successfully!",
-            "data": {
-                "username": username,
-                "email": email
-            }
-        }), 201
+        role = request.form.get('user_role', 'USER').upper()
+        role_enum = UserRole.ADMIN if role == 'ADMIN' else UserRole.USER
+
+        dao.add_user(fullname=fullname, username=username, password=password,
+                     email=email, avatar=avatar_path, user_role=role_enum)
+
+        return jsonify({"status": "success", "message": "Registered successfully!"}), 201
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 400
 

@@ -1,0 +1,46 @@
+<header class="bg-white border-bottom sticky-top">
+  <div class="container">
+    <div class="d-flex align-items-center justify-content-between py-2">
+
+      <a href="/" class="d-flex align-items-center text-decoration-none">
+        <div class="d-flex align-items-center justify-content-center me-2"
+             style="width:40px;height:40px;background:#34D399;border-radius:10px;">
+          <span style="font-size:18px; color: white"><i class="bi bi-calendar"></i></span>
+        </div>
+        <span class="fw-bold fs-5" style="color: black">SportBook</span>
+      </a>
+
+      <nav class="d-flex gap-2">
+        <a href="/" class="btn {{'btn-primary active' if request.path == '/' else 'btn-light'}}">
+          <i class="bi bi-house-door me-1"></i> Home
+        </a>
+
+        <a href="/bookings" class="btn {{'btn-primary active' if request.path == '/bookings' else 'btn-light'}}">
+          <i class="bi bi-calendar me-1"></i> My Bookings
+        </a>
+
+        <a href="/profile" class="btn {{'btn-primary active' if request.path == '/profile' else 'btn-light'}}">
+          <i class="bi bi-person me-1"></i> Profile
+        </a>
+      </nav>
+
+      <div class="d-flex align-items-center gap-3">
+        <div class="text-end">
+          <div class="fw-medium" id="userName">John Doe</div>
+          <div class="text-muted small" id="userEmail">john@example.com</div>
+        </div>
+
+        <button class="btn btn-outline-danger btn-sm" onclick="logout()">
+          <i class="bi bi-box-arrow-right me-1"></i> Logout
+        </button>
+      </div>
+
+    </div>
+  </div>
+</header>
+
+<script>
+function logout() {
+  window.location.href = "/login";
+}
+</script>

@@ -22,3 +22,4 @@ cloudinary.config(cloud_name='dyupzyqwj',
                   api_key='497522642724389',
                   api_secret='1qiLwjHVPTBX9_BYZKsRB2FfWJA')
 
+
