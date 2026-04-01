@@ -1,7 +1,7 @@
 import pytest
 from io import BytesIO
 from unittest.mock import patch
-
+from bapp.models import UserRole
 from bapp.index import *
 
 
@@ -103,7 +103,6 @@ def test_register_invalid_email(client):
     assert response.get_json()['message'] == "Invalid email format!"
 
 
-
 class MockUser:
     def __init__(self, id, username):
         self.id = id
@@ -167,3 +166,39 @@ def test_logout_success(client):
     assert response.status_code == 200
     assert json_data['status'] == "success"
     assert json_data['message'] == "Signed out successfully!"
+
+# 10. TC_REG_08
+
+@patch('cloudinary.uploader.upload')
+@patch('bapp.index.dao.add_user')
+def test_security_prevent_admin_registration(mock_add_user, mock_cloudinary, client):
+    mock_cloudinary.return_value = {'secure_url': 'https://fake-url.com/avatar.png'}
+    mock_add_user.return_value = True
+
+    response = client.post('/api/register', data={
+        'fullname': 'Hacker',
+        'email': 'hacker@gmail.com',
+        'username': 'hacker123',
+        'password': 'ValidPass123',
+        'confirm': 'ValidPass123',
+        'avatar': get_mock_avatar(),
+        'user_role': 'ADMIN'
+    }, content_type='multipart/form-data')
+
+    args, kwargs = mock_add_user.call_args
+
+    assert kwargs['user_role'] == UserRole.USER, "cho phép người dùng tự cấp quyền ADMIN!"
+
+# 11. TC_REG_09
+def test_security_prevent_malicious_file_upload(client):
+    response = client.post('/api/register', data={
+        'fullname': 'Hacker',
+        'email': 'hacker@gmail.com',
+        'username': 'hacker123',
+        'password': 'ValidPass123',
+        'confirm': 'ValidPass123',
+        'avatar': (BytesIO(b"print('Hacked!')"), 'malware.exe')
+    }, content_type='multipart/form-data')
+
+    assert response.status_code == 400
+    assert b"Invalid file type" in response.data or b"Only images" in response.data
