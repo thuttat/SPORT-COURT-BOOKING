@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Button } from "./ui/Button.jsx";
+import { Button } from "./Button.jsx";
 
 export function Header() {
     const navigate = useNavigate();
@@ -13,7 +13,6 @@ export function Header() {
         <header className="header">
             <div className="container header-inner">
 
-                {/* Logo */}
                 <Link to="/" className="logo">
                     <div className="logo-icon">📅</div>
                     <span className="logo-text">SportBook</span>

@@ -1,4 +1,4 @@
-import {Button} from "../../components/ui/Button.jsx";
+import {Button} from "../../components/common/Button.jsx";
 
 export function Login() {
     return (

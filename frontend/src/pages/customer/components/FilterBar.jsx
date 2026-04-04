@@ -1,5 +1,4 @@
-import "./FilterBar.css";
-import { Button } from "../ui/Button";
+import { Button } from "../../../components/common/Button.jsx";
 
 export function FilterBar({
                               search,

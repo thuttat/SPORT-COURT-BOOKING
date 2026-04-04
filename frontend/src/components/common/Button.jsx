@@ -1,4 +1,4 @@
-import "./Button.css";
+import "../styles/button.css";
 
 export function Button({ children, className = "", ...props }) {
     return (

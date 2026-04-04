@@ -29,3 +29,9 @@
     background: #ef4444 !important;
     color: white;
 }
+
+.btn-disabled {
+    background: var(--booked);
+    color: #888;
+    cursor: not-allowed;
+}

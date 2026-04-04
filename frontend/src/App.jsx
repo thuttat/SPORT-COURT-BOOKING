@@ -5,6 +5,7 @@ import {Bookings} from "./pages/customer/Bookings.jsx";
 import {Login} from "./pages/auth/Login.jsx";
 import {Register} from "./pages/auth/Register.jsx";
 import {Profile} from "./pages/customer/Profile.jsx";
+import {CourtBooking} from "./pages/customer/CourtBooking.jsx";
 
 function App() {
     return (
@@ -14,6 +15,7 @@ function App() {
                 <Route path="/register" element={<Register />} />
                 <Route element={<CustomerLayout />}>
                     <Route path="/" element={<Home />} />
+                    <Route path="/court/:id" element={<CourtBooking />} />
                     <Route path="/bookings" element={<Bookings />} />
                     <Route path="/profile" element={<Profile />} />
                 </Route>

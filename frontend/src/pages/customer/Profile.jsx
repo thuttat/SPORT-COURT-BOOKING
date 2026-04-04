@@ -1,4 +1,4 @@
-import {PageHeader} from "../../components/ui/PageHeader.jsx";
+import {PageHeader} from "../../components/common/PageHeader.jsx";
 
 export function Profile() {
 

@@ -1,8 +1,9 @@
 import { useState } from "react";
-import {CourtCard} from "../../components/ui/CourtCard.jsx";
-import {FilterBar} from "../../components/ui/FilterBar.jsx";
-import {EmptyState} from "../../components/ui/EmptyState.jsx";
-import {PageHeader} from "../../components/ui/PageHeader.jsx";
+import {CourtCard} from "./components/CourtCard.jsx";
+import {FilterBar} from "./components/FilterBar.jsx";
+import {EmptyState} from "./components/EmptyState.jsx";
+import {PageHeader} from "../../components/common/PageHeader.jsx";
+import "./styles/home.css";
 
 export function Home() {
     const fields = [
@@ -55,7 +56,6 @@ export function Home() {
 
     const [search, setSearch] = useState("");
     const [selectedSport, setSelectedSport] = useState("all");
-    const [selectedDate, setSelectedDate] = useState("");
 
     const filteredFields = fields.filter(field => {
         const matchSearch = field.name
@@ -67,6 +67,13 @@ export function Home() {
 
         return matchSearch && matchSport;
     });
+
+    const getToday = () => {
+        const today = new Date();
+        return today.toISOString().split("T")[0];
+    };
+
+    const [selectedDate, setSelectedDate] = useState(getToday());
 
     return (
         <div className="container">
