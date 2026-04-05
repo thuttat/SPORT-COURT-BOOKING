@@ -1,5 +1,6 @@
-import { Link, useNavigate } from "react-router-dom";
+import {NavLink, useNavigate} from "react-router-dom";
 import { Button } from "./Button.jsx";
+import {Calendar, House, UserPen} from "lucide-react";
 
 export function Header() {
     const navigate = useNavigate();
@@ -12,16 +13,21 @@ export function Header() {
     return (
         <header className="header">
             <div className="container header-inner">
-
-                <Link to="/" className="logo">
+                <NavLink to="/" className="logo">
                     <div className="logo-icon">📅</div>
                     <span className="logo-text">SportBook</span>
-                </Link>
+                </NavLink>
 
                 <nav className="nav">
-                    <Link to="/" className="nav-btn">Home</Link>
-                    <Link to="/bookings" className="nav-btn">My Bookings</Link>
-                    <Link to="/profile" className="nav-btn">Profile</Link>
+                    <NavLink to="/" className={({ isActive }) =>
+                        isActive ? "nav-btn active" : "nav-btn"
+                    }><House size={20} strokeWidth={1.75} /> Home</NavLink>
+                    <NavLink to="/bookings" className={({ isActive }) =>
+                        isActive ? "nav-btn active" : "nav-btn"
+                    }><Calendar size={20} strokeWidth={1.75} /> My Bookings</NavLink>
+                    <NavLink to="/profile" className={({ isActive }) =>
+                        isActive ? "nav-btn active" : "nav-btn"
+                    }><UserPen size={20} strokeWidth={1.75} /> Profile</NavLink>
                 </nav>
 
                 <div className="user-section">

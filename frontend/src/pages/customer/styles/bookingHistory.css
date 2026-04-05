@@ -1,0 +1,137 @@
+.booking-history-container {
+    padding: 32px;
+}
+
+.booking-history-wrapper {
+    max-width: 800px;
+    margin: auto;
+}
+
+.header {
+    margin-bottom: 24px;
+}
+
+.header h1 {
+    margin: 0;
+}
+
+.header p {
+    color: #64748b;
+}
+
+.tabs {
+    display: flex;
+    gap: 16px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 24px;
+}
+
+.booking-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.booking-card {
+    transition: 0.2s;
+}
+
+.booking-card:hover {
+    transform: translateY(-4px);
+}
+
+.booking-row {
+    display: grid;
+    grid-template-columns: 80px 1fr auto;
+    gap: 16px;
+    align-items: center;
+}
+
+.sport-icon {
+    width: 70px;
+    height: 70px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+}
+
+.sport-icon.football {
+    background: var(--pastel-blue);
+}
+
+.sport-icon.badminton {
+    background: var(--available);
+}
+
+.sport-icon.tennis {
+    background: var(--pastel-purple);
+}
+
+.booking-info {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.top {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.top .badge {
+    width: fit-content;
+    flex-shrink: 0;
+}
+
+.title-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.meta {
+    display: flex;
+    gap: 20px;
+    font-size: 14px;
+    color: #64748b;
+    align-items: center;
+}
+
+.slots {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.empty {
+    text-align: center;
+    padding: 40px;
+}
+
+.empty .icon {
+    font-size: 40px;
+    margin-bottom: 10px;
+}
+
+.content {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.field-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--foreground);
+    margin: 0;
+}

@@ -6,7 +6,7 @@ import {PageHeader} from "../../components/common/PageHeader.jsx";
 import "./styles/home.css";
 
 export function Home() {
-    const fields = [
+    const courts = [
         {
             "id": "c1",
             "name": "Sân bóng đá Mini A",
@@ -57,13 +57,13 @@ export function Home() {
     const [search, setSearch] = useState("");
     const [selectedSport, setSelectedSport] = useState("all");
 
-    const filteredFields = fields.filter(field => {
-        const matchSearch = field.name
+    const filteredFields = courts.filter(court => {
+        const matchSearch = court.name
             .toLowerCase()
             .includes(search.toLowerCase());
 
         const matchSport =
-            selectedSport === "all" || field.sport === selectedSport;
+            selectedSport === "all" || court.sport === selectedSport;
 
         return matchSearch && matchSport;
     });
@@ -77,7 +77,7 @@ export function Home() {
 
     return (
         <div className="container">
-            <PageHeader header="Find Your Field" text="Book your favorite sports field in just a few clicks" />
+            <PageHeader header="Find Your Field" text="Book your favorite sports court in just a few clicks" />
 
             <FilterBar
                 search={search}
@@ -89,8 +89,8 @@ export function Home() {
             />
 
             <div className="grid">
-                {filteredFields.map(field => (
-                    <CourtCard key={field.id} court={field} />
+                {filteredFields.map(court => (
+                    <CourtCard key={court.id} court={court} />
                 ))}
             </div>
 

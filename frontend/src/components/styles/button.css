@@ -35,3 +35,21 @@
     color: #888;
     cursor: not-allowed;
 }
+
+.tab-btn {
+    background: transparent;
+    border: none;
+    color: #64748b;
+    padding: 10px 16px;
+    border-radius: 10px 10px 0 0;
+}
+
+.tab-btn:hover {
+    background: var(--secondary);
+}
+
+.tab-btn.active {
+    color: var(--primary);
+    border-bottom: 2px solid var(--primary);
+    background: rgba(52, 211, 153, 0.08);
+}
