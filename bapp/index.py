@@ -10,6 +10,7 @@ from datetime import datetime as dt_class
 
 from bapp import app, dao, login_manager, db, utils
 from bapp.models import UserRole, BookingStatus, Field, FieldType, Booking
+from bapp.utils import allowed_file
 
 
 @app.route('/api/login', methods=['POST'])
@@ -59,6 +60,9 @@ def register_user():
 
     if not re.match(email_pattern, email):
         return jsonify({"status": "error", "message": "Invalid email format!"}), 400
+
+    if avatar and not allowed_file(avatar.filename):
+        return jsonify({"status": "error", "message": "Invalid file type! Only images (PNG, JPG, JPEG) are allowed!"}), 400
 
     try:
         res = cloudinary.uploader.upload(avatar)
