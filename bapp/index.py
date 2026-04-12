@@ -1,5 +1,5 @@
 import math
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import cloudinary
 import cloudinary.uploader
@@ -178,7 +178,8 @@ def create_booking():
             return jsonify({"status": "error", "message": "Field or time slot not found!"}), 404
 
         booking_datetime = dt_class.combine(booking_date, time_slot.start_time)
-        if booking_datetime < dt_class.now():
+        now_in_vi=dt_class.utcnow()+timedelta(hours=7)
+        if booking_datetime < now_in_vi:
             return jsonify({"status": "error", "message": "Cannot book a court in the past"}), 400
 
         duration = utils.calculate_duration(time_slot.start_time, time_slot.end_time)
