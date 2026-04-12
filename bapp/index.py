@@ -9,6 +9,7 @@ from flask_login import login_user, login_required, logout_user, current_user
 from datetime import datetime as dt_class
 
 from bapp import app, dao, login_manager, db, utils
+from bapp.decorators import admin_only
 from bapp.models import UserRole, BookingStatus, Field, FieldType, Booking
 from bapp.utils import allowed_file
 
@@ -67,11 +68,7 @@ def register_user():
     try:
         res = cloudinary.uploader.upload(avatar)
         avatar_path = res['secure_url']
-        role = request.form.get('user_role')
-        if role and role.strip().upper() == 'ADMIN':
-            role_enum = UserRole.ADMIN
-        else:
-            role_enum = UserRole.USER
+        role_enum = UserRole.USER
         dao.add_user(
             fullname=fullname,
             username=username,
@@ -285,6 +282,8 @@ def get_my_fields():
 
 
 @app.route('/api/fields', methods=['POST'])
+@login_required
+@admin_only
 def add_new_field():
     if not current_user.is_authenticated or current_user.user_role != UserRole.ADMIN:
         return jsonify({"message": "Access Denied"}), 403
@@ -330,6 +329,8 @@ def add_new_field():
 
 
 @app.route('/api/fields/<int:field_id>', methods=['PATCH'])
+@login_required
+@admin_only
 def update_field(field_id):
     field = Field.query.get(field_id)
     if not field:
@@ -390,6 +391,8 @@ def update_field(field_id):
 
 
 @app.route('/api/fields/<int:field_id>', methods=['DELETE'])
+@login_required
+@admin_only
 def delete_field(field_id):
     field = Field.query.get(field_id)
     if not field:
