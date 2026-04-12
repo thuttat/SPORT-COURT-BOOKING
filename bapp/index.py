@@ -56,6 +56,10 @@ def register_user():
     if not fullname or not email or not username or not password or not confirm or not avatar:
         return jsonify({"status": "error", "message": "Please fill out all required fields!"}), 400
 
+    password_pattern = r"^(?=.*[!@#$%^&*(),.?\":{}|<>]).{8,}$"
+    if not re.match(password_pattern, password):
+        return jsonify({"status": "error", "message": "Invalid password format!"}), 400
+
     if password != confirm:
         return jsonify({"status": "error", "message": "Passwords do not match!"}), 400
 
@@ -226,9 +230,9 @@ def cancel_booking(booking_id):
         return jsonify({"status": "error", "message": "This booking is already cancelled."}), 400
 
     start_datetime=datetime.combine(booking_order.booking_date, booking_order.time_slot.start_time)
-    now=datetime.now()
-    time_diff=start_datetime-now
-    minutes_diff=time_diff.total_seconds()/60
+    now_in_vn = datetime.utcnow() + timedelta(hours=7)
+    time_diff = start_datetime - now_in_vn
+    minutes_diff = time_diff.total_seconds() / 60
     if minutes_diff < 0:
         return jsonify({
             "status": "error",
