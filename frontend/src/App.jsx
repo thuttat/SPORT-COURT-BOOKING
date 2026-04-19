@@ -7,6 +7,8 @@ import {Profile} from "./pages/customer/Profile.jsx";
 import {CourtBooking} from "./pages/customer/CourtBooking.jsx";
 import {BookingHistory} from "./pages/customer/BookingHistory.jsx";
 import {BookingDetails} from "./pages/customer/BookingDetails.jsx";
+import {AdminDashboard} from "./pages/admin/AdminDashboard.jsx";
+import AdminLayout from "./layouts/AdminLayout.jsx";
 
 function App() {
     return (
@@ -21,7 +23,9 @@ function App() {
                     <Route path="/booking/:id" element={<BookingDetails />} />
                     <Route path="/profile" element={<Profile />} />
                 </Route>
-
+                <Route path="/admin" element={<AdminLayout />}>
+                    <Route path="dashboard" element={<AdminDashboard />} />
+                </Route>
             </Routes>
         </BrowserRouter>
     );
