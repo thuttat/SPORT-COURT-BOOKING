@@ -20,70 +20,6 @@ body {
   justify-content: space-between;
 }
 
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  text-decoration: none;
-  color: black;
-}
-
-.logo-icon {
-  width: 40px;
-  height: 40px;
-  background: var(--primary);
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-}
-
-.logo-text {
-  font-weight: 600;
-  font-size: 18px;
-}
-
-.nav {
-  display: flex;
-  gap: 8px;
-}
-
-.nav-btn {
-  padding: 8px 14px;
-  border-radius: 12px;
-  text-decoration: none;
-  color: black;
-  transition: 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.nav-btn:hover {
-  background: var(--muted);
-  border: 1px solid var(--primary);
-}
-
-.nav-btn.active {
-  background: var(--primary);
-  color: white;
-}
-
-.user-section {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.user-info {
-  text-align: right;
-}
-
-.user-name {
-  font-weight: 500;
-}
-
 .footer {
   margin-top: auto;
   text-align: center;
@@ -91,12 +27,6 @@ body {
   padding: 18px;
   background: var(--primary);
   font-size: 16px;
-}
-
-.form-control {
-  background-color: var(--muted);
-  border: 1px solid var(--border);
-  border-radius: 12px;
 }
 
 .text-muted {
@@ -129,7 +59,7 @@ body {
   padding: 10px 14px;
   border-radius: 12px;
   border: 1px solid var(--border);
-  background: var(--muted);
+  background: white;
   outline: none;
 }
 
@@ -202,11 +132,6 @@ body {
 
 .form-group label {
   font-size: 14px;
-}
-
-.login-btn {
-  width: 100%;
-  margin-top: 8px;
 }
 
 .link-primary {

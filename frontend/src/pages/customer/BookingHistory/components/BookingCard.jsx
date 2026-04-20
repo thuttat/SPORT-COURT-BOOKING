@@ -1,6 +1,6 @@
-import { Card, CardContent } from "../../../components/common/Card.jsx";
-import { Button } from "../../../components/common/Button.jsx";
-import { Badge } from "../../../components/common/Badge.jsx";
+import { Card, CardContent } from "../../../../components/common/Card.jsx";
+import { Button } from "../../../../components/common/Button.jsx";
+import { Badge } from "../../../../components/common/Badge.jsx";
 import {useNavigate} from "react-router-dom";
 
 const sportIcons = {
@@ -61,7 +61,7 @@ export function BookingCard({ booking, showCancel }) {
                     </div>
 
                     <div className="actions">
-                        <Button onClick={() => navigate(`/booking/${booking.id}`)}>
+                        <Button onClick={() => navigate(`/booking/${booking.id}`)} className="btn-outline">
                             View
                         </Button>
                         {showCancel && (

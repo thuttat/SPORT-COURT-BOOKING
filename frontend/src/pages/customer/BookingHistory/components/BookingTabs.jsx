@@ -1,4 +1,4 @@
-import { Button } from "../../../components/common/Button.jsx";
+import { Button } from "../../../../components/common/Button.jsx";
 
 export function BookingTabs({ activeTab, setActiveTab }) {
     return (

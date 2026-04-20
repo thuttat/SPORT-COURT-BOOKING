@@ -1,9 +1,9 @@
 import { useState } from "react";
 import {CourtCard} from "./components/CourtCard.jsx";
 import {FilterBar} from "./components/FilterBar.jsx";
-import {EmptyState} from "./components/EmptyState.jsx";
-import {PageHeader} from "../../components/common/PageHeader.jsx";
-import "./styles/home.css";
+import {PageHeader} from "../../../components/common/PageHeader.jsx";
+import "./home.css";
+import {EmptyState} from "../../../components/common/EmptyState.jsx";
 
 export function Home() {
     const courts = [
@@ -70,7 +70,10 @@ export function Home() {
 
     const getToday = () => {
         const today = new Date();
-        return today.toISOString().split("T")[0];
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
     };
 
     const [selectedDate, setSelectedDate] = useState(getToday());
@@ -94,7 +97,7 @@ export function Home() {
                 ))}
             </div>
 
-            {filteredFields.length === 0 && <EmptyState />}
+            {filteredFields.length === 0 && <EmptyState text="courts" /> }
         </div>
     );
 }

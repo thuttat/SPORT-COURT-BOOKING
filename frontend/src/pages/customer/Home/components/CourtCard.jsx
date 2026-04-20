@@ -1,6 +1,6 @@
-import { Card, CardContent, CardFooter } from "../../../components/common/Card.jsx";
-import {Button} from "../../../components/common/Button.jsx";
-import {Badge} from "../../../components/common/Badge.jsx";
+import { Card, CardContent, CardFooter } from "../../../../components/common/Card.jsx";
+import {Button} from "../../../../components/common/Button.jsx";
+import {Badge} from "../../../../components/common/Badge.jsx";
 import {useNavigate} from "react-router-dom";
 
 export function CourtCard({ court }) {

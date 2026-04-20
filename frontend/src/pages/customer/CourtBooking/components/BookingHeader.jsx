@@ -1,5 +1,5 @@
-import { Button } from "../../../components/common/Button.jsx";
-import { Badge } from "../../../components/common/Badge.jsx";
+import { Button } from "../../../../components/common/Button.jsx";
+import { Badge } from "../../../../components/common/Badge.jsx";
 import { ArrowLeft } from "lucide-react";
 
 export function BookingHeader({ onBack, name }) {

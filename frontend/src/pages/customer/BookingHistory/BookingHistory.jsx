@@ -1,9 +1,10 @@
 import { useState } from "react";
-import {Card} from "../../components/common/Card.jsx";
-import "./styles/bookingHistory.css";
-import {PageHeader} from "../../components/common/PageHeader.jsx";
+import {Card} from "../../../components/common/Card.jsx";
+import "./bookingHistory.css";
+import {PageHeader} from "../../../components/common/PageHeader.jsx";
 import {BookingTabs} from "./components/BookingTabs.jsx";
 import {BookingCard} from "./components/BookingCard.jsx";
+import {EmptyState} from "../../../components/common/EmptyState.jsx";
 
 export function BookingHistory() {
     const [activeTab, setActiveTab] = useState("upcoming");
@@ -50,13 +51,7 @@ export function BookingHistory() {
 
                 <div className="booking-list">
                     {displayedBookings.length === 0 ? (
-                        <Card className="empty-card">
-                            <div className="empty">
-                                <div className="icon">📅</div>
-                                <h3>No bookings found</h3>
-                                <p>Try booking a court first</p>
-                            </div>
-                        </Card>
+                        <EmptyState text="bookings" />
                     ) : (
                         displayedBookings.map(booking => (
                             <BookingCard key={booking.id} booking={booking} showCancel={activeTab === "upcoming"} />

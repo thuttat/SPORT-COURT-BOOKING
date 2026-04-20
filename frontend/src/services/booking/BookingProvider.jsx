@@ -4,7 +4,8 @@ import { BookingContext } from "./bookingContext";
 export function BookingProvider({ children }) {
     const [fields] = useState([
         { id: "c1", sport: "football", available: true },
-        { id: "c2", sport: "badminton", available: true }
+        { id: "c2", sport: "badminton", available: true },
+        { id: "c3", sport: "tennis", available: true }
     ]);
 
     const [bookings] = useState([

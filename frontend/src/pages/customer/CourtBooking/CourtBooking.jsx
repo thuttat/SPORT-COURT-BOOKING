@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import {Card, CardContent} from "../../components/common/Card.jsx";
+import {Card, CardContent} from "../../../components/common/Card.jsx";
 import { BookingHeader } from "./components/BookingHeader.jsx";
-import { DateSelector } from "./components/DateSelector.jsx";
+import { DateSelector } from "../../../components/common/DateSelector.jsx";
 import { TimeSlotGrid } from "./components/TimeSlotGrid.jsx";
 import { BookingSummary } from "./components/BookingSummary.jsx";
 
-import "./styles/courtBooking.css";
+import "./courtBooking.css";
 
 const timeSlots = [
     "08:00","09:00","10:00","11:00","12:00",

@@ -1,6 +1,6 @@
-import {Card, CardContent} from "../../../components/common/Card.jsx";
-import { Badge } from "../../../components/common/Badge.jsx";
-import { Button } from "../../../components/common/Button.jsx";
+import {Card, CardContent} from "../../../../components/common/Card.jsx";
+import { Badge } from "../../../../components/common/Badge.jsx";
+import { Button } from "../../../../components/common/Button.jsx";
 
 export function BookingSummary({ date, slots, className = "" }) {
     return (

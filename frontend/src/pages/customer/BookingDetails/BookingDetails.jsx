@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { Card, CardContent } from "../../components/common/Card.jsx";
-import { Button } from "../../components/common/Button.jsx";
-import { Badge } from "../../components/common/Badge.jsx";
+import { Card, CardContent } from "../../../components/common/Card.jsx";
+import { Button } from "../../../components/common/Button.jsx";
+import { Badge } from "../../../components/common/Badge.jsx";
 import {ArrowLeft} from "lucide-react";
 
 export function BookingDetails() {

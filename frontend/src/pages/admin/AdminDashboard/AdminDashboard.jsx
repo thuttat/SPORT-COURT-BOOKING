@@ -1,9 +1,11 @@
 import React from "react";
-import { Card, CardContent } from "../../components/common/Card.jsx";
+import { Card, CardContent } from "../../../components/common/Card.jsx";
 import { LayoutGrid, Calendar, TrendingUp, MapPin } from "lucide-react";
 import { format, isToday } from "date-fns";
 import "./adminDashboard.css";
-import {useBooking} from "../../services/booking/useBooking.js";
+import {useBooking} from "../../../services/booking/useBooking.js";
+import {PageHeader} from "../../../components/common/PageHeader.jsx";
+import {EmptyState} from "../../../components/common/EmptyState.jsx";
 
 export function AdminDashboard() {
     const bookingData = useBooking() || {};
@@ -25,10 +27,7 @@ export function AdminDashboard() {
     return (
         <div className="admin-container">
             <div className="admin-wrapper">
-                <div className="admin-header">
-                    <h1>Admin Dashboard</h1>
-                    <p>Overview of your sports booking system</p>
-                </div>
+                <PageHeader header="Admin Dashboard" text="Overview of your sports booking system" />
 
                 <div className="stats-grid">
                     <Card className="stat-card blue">
@@ -87,7 +86,7 @@ export function AdminDashboard() {
                 <div className="dashboard-grid">
                     <Card>
                         <CardContent className="content">
-                            <h2>Fields by Sport</h2>
+                            <h3>Fields by Sport</h3>
 
                             <div className="sport-list">
                                 {Object.entries(sportCounts).map(([sport, count]) => (
@@ -99,7 +98,7 @@ export function AdminDashboard() {
                                                     {sport === "badminton" && "🏸"}
                                                     {sport === "tennis" && "🎾"}
                                                 </span>
-                                                <span className="capitalize">{sport}</span>
+                                                <span className="capitalize">{sport.charAt(0).toUpperCase() + sport.slice(1)}</span>
                                             </div>
                                             <span className="sport-count">{count}</span>
                                         </div>
@@ -120,7 +119,7 @@ export function AdminDashboard() {
 
                     <Card>
                         <CardContent className="content">
-                            <h2>Recent Bookings</h2>
+                            <h3>Recent Bookings</h3>
                             <div className="recent-list">
                                 {bookings.slice(0, 5).map((booking) => (
                                     <div key={booking.id} className="recent-item">
@@ -144,10 +143,7 @@ export function AdminDashboard() {
                                 ))}
 
                                 {bookings.length === 0 && (
-                                    <div className="empty">
-                                        <Calendar size={40} />
-                                        <p>No bookings yet</p>
-                                    </div>
+                                    <EmptyState text="bookings" />
                                 )}
                             </div>
                         </CardContent>
