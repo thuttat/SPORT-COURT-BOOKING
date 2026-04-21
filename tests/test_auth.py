@@ -1,204 +1,169 @@
 import pytest
 from io import BytesIO
-from unittest.mock import patch
 from bapp.models import UserRole
-from bapp.index import *
+from test_base import test_client, test_app, test_session
+
+def get_mock_file(filename='avatar.png'):
+    return (BytesIO(b"fake_image_data"), filename)
 
 
-@pytest.fixture
-def client():
-    app.config['TESTING'] = True
-    with app.test_client() as client:
-        yield client
-
-
-def get_mock_avatar():
-    return (BytesIO(b"fake_image_data"), 'avatar.png')
-
-
-# 1. TC_REG_01
-@patch('cloudinary.uploader.upload')
-@patch('bapp.index.dao.add_user')
-def test_register_success(mock_add_user, mock_cloudinary, client):
-    mock_cloudinary.return_value = {'secure_url': 'https://res.cloudinary.com/fake_avatar.png'}
-    mock_add_user.return_value = True
-
-    response = client.post('/api/register', data={
+# TC_REG_01
+def test_register_success(test_client, mocker):
+    mocker.patch('cloudinary.uploader.upload', return_value={'secure_url': 'https://fake.url/avatar.png'})
+    mocker.patch('bapp.index.dao.add_user')
+    
+    res = test_client.post('/api/register', data={
         'fullname': 'Test User',
         'email': 'test@gmail.com',
         'username': 'newuser',
-        'password': 'ValidPass123',
-        'confirm': 'ValidPass123',
-        'avatar': get_mock_avatar()
+        'password': 'ValidPass123!',
+        'confirm': 'ValidPass123!',
+        'avatar': get_mock_file()
     }, content_type='multipart/form-data')
-
-    json_data = response.get_json()
-    assert response.status_code == 201
-    assert json_data['status'] == "success"
-    assert json_data['message'] == "Registered successfully!"
-
-
-# 2. TC_REG_02
-def test_register_missing_fields(client):
-    response = client.post('/api/register', data={
-        'email': 'test@gmail.com',
-        'username': 'newuser',
-        'password': 'ValidPass123',
-        'confirm': 'ValidPass123'
-    })
-
-    json_data = response.get_json()
-    assert response.status_code == 400
-    assert json_data['status'] == "error"
-    assert json_data['message'] == "Please fill out all required fields!"
+    
+    data = res.get_json()
+    assert res.status_code == 201
+    assert data['status'] == "success"
 
 
-# 3. TC_REG_03
-@patch('cloudinary.uploader.upload')
-@patch('bapp.index.dao.add_user')
-def test_register_exist_username(mock_add_user, mock_cloudinary, client):
-    mock_cloudinary.return_value = {'secure_url': 'https://res.cloudinary.com/fake_avatar.png'}
-    mock_add_user.side_effect = Exception("Username already exists!")
+# TC_REG_02
+@pytest.mark.parametrize("missing_field", [
+    'fullname', 'email', 'username', 'password', 'confirm'
+])
+def test_register_missing_fields(test_client, missing_field):
+    form_data = {
+        'fullname': 'Test User', 'email': 'test@gmail.com', 'username': 'newuser',
+        'password': 'ValidPass123!', 'confirm': 'ValidPass123!', 'avatar': get_mock_file()
+    }
+    form_data[missing_field] = '' 
+    
+    res = test_client.post('/api/register', data=form_data, content_type='multipart/form-data')
+    assert res.status_code == 400
+    assert "Please fill out all required fields" in res.get_json()['message']
 
-    response = client.post('/api/register', data={
-        'fullname': 'Test User',
-        'email': 'test@gmail.com',
-        'username': 'existuser',
-        'password': 'ValidPass123',
-        'confirm': 'ValidPass123',
-        'avatar': get_mock_avatar()
+
+# TC_REG_03: 
+def test_register_username_exists(test_client, mocker):
+    mocker.patch('cloudinary.uploader.upload', return_value={'secure_url': 'url'})
+    mocker.patch('bapp.index.dao.add_user', side_effect=Exception('Username already exists!'))
+    
+    res = test_client.post('/api/register', data={
+        'fullname': 'Test User', 'email': 'test2@gmail.com', 'username': 'existuser',
+        'password': 'ValidPass123!', 'confirm': 'ValidPass123!', 'avatar': get_mock_file()
     }, content_type='multipart/form-data')
+    
+    assert res.status_code == 400
+    assert "Username already exists" in res.get_json()['message']
 
-    assert response.status_code == 400
-    assert response.get_json()['message'] == "Username already exists!"
 
-
-# 4. TC_REG_04
-def test_register_password_mismatch(client):
-    response = client.post('/api/register', data={
-        'fullname': 'Test User',
-        'email': 'test@gmail.com',
-        'username': 'newuser',
-        'password': 'ValidPass123',
-        'confirm': 'DifferentPass',
-        'avatar': get_mock_avatar()
+# TC_REG_04: 
+def test_register_passwords_not_match(test_client):
+    res = test_client.post('/api/register', data={
+        'fullname': 'Test User', 'email': 'test@gmail.com', 'username': 'newuser',
+        'password': 'ValidPass123!', 
+        'confirm': 'DifferentPass123!', 
+        'avatar': get_mock_file()
     }, content_type='multipart/form-data')
+    
+    assert res.status_code == 400
+    assert "Passwords do not match" in res.get_json()['message']
 
-    assert response.status_code == 400
-    assert response.get_json()['message'] == "Passwords do not match!"
 
-
-# 5. TC_REG_05
-def test_register_invalid_email(client):
-    response = client.post('/api/register', data={
-        'fullname': 'Test User',
-        'email': 'invalid-email-format',
-        'username': 'newuser',
-        'password': 'ValidPass123',
-        'confirm': 'ValidPass123',
-        'avatar': get_mock_avatar()
+# TC_REG_05: 
+@pytest.mark.parametrize("invalid_email", ["test@gmail", "test.com", "test@.com", "test@gmail."])
+def test_register_invalid_email(test_client, invalid_email):
+    res = test_client.post('/api/register', data={
+        'fullname': 'Test', 'email': invalid_email, 'username': 'newuser',
+        'password': 'ValidPass123!', 'confirm': 'ValidPass123!', 'avatar': get_mock_file()
     }, content_type='multipart/form-data')
-
-    assert response.status_code == 400
-    assert response.get_json()['message'] == "Invalid email format!"
-
-
-class MockUser:
-    def __init__(self, id, username):
-        self.id = id
-        self.username = username
-        self.is_active = True
-        self.is_authenticated = True
-
-    def get_id(self):
-        return str(self.id)
+    
+    assert res.status_code == 400
+    assert "Invalid email format" in res.get_json()['message']
 
 
-# 6. TC_LOG_01
-@patch('bapp.index.dao.auth_user')
-def test_login_success(mock_auth_user, client):
-    mock_auth_user.return_value = MockUser(id=1, username="testuser")
-
-    response = client.post('/api/login', data={
-        'username': 'testuser',
-        'password': 'RightPassword123'
-    })
-
-    json_data = response.get_json()
-    assert response.status_code == 200
-    assert json_data['status'] == "success"
-    assert json_data['data']['username'] == "testuser"
-
-
-# 7. TC_LOG_02
-@patch('bapp.index.dao.auth_user')
-def test_login_fail_wrong_password(mock_auth_user, client):
-    mock_auth_user.return_value = None
-
-    response = client.post('/api/login', data={
-        'username': 'testuser',
-        'password': 'WrongPassword123'
-    })
-
-    assert response.status_code == 400
-    assert response.get_json()['message'] == "Invalid username or password!"
-
-
-# 8. TC_LOG_03
-@patch('bapp.index.dao.auth_user')
-def test_login_fail_wrong_username(mock_auth_user, client):
-    mock_auth_user.return_value = None
-
-    response = client.post('/api/login', data={
-        'username': 'notexistuser',
-        'password': 'ValidPassword123'
-    })
-
-    assert response.status_code == 400
-    assert response.get_json()['message'] == "Invalid username or password!"
-
-
-# 9. TC_OUT_04
-def test_logout_success(client):
-    response = client.post('/api/logout')
-
-    json_data = response.get_json()
-    assert response.status_code == 200
-    assert json_data['status'] == "success"
-    assert json_data['message'] == "Signed out successfully!"
-
-# 10. TC_REG_08
-
-@patch('cloudinary.uploader.upload')
-@patch('bapp.index.dao.add_user')
-def test_security_prevent_admin_registration(mock_add_user, mock_cloudinary, client):
-    mock_cloudinary.return_value = {'secure_url': 'https://fake-url.com/avatar.png'}
-    mock_add_user.return_value = True
-
-    response = client.post('/api/register', data={
-        'fullname': 'Hacker',
-        'email': 'hacker@gmail.com',
-        'username': 'hacker123',
-        'password': 'ValidPass123',
-        'confirm': 'ValidPass123',
-        'avatar': get_mock_avatar(),
-        'user_role': 'ADMIN'
+# TC_REG_06: 
+def test_register_prevent_admin_escalation(test_client, mocker):
+    mocker.patch('cloudinary.uploader.upload', return_value={'secure_url': 'url'})
+    mock_add = mocker.patch('bapp.index.dao.add_user')
+    
+    test_client.post('/api/register', data={
+        'fullname': 'Hacker', 'email': 'hacker@gmail.com', 'username': 'hacker',
+        'password': 'ValidPass123!', 'confirm': 'ValidPass123!', 'avatar': get_mock_file(),
+        'user_role': 'ADMIN' 
     }, content_type='multipart/form-data')
+    
+    kwargs = mock_add.call_args.kwargs
+    assert kwargs['user_role'] == UserRole.USER
 
-    args, kwargs = mock_add_user.call_args
 
-    assert kwargs['user_role'] == UserRole.USER, "cho phép người dùng tự cấp quyền ADMIN!"
-
-# 11. TC_REG_09
-def test_security_prevent_malicious_file_upload(client):
-    response = client.post('/api/register', data={
-        'fullname': 'Hacker',
-        'email': 'hacker@gmail.com',
-        'username': 'hacker123',
-        'password': 'ValidPass123',
-        'confirm': 'ValidPass123',
-        'avatar': (BytesIO(b"print('Hacked!')"), 'malware.exe')
+# TC_REG_07: 
+def test_register_malicious_file(test_client):
+    res = test_client.post('/api/register', data={
+        'fullname': 'Test', 'email': 'test@gmail.com', 'username': 'newuser',
+        'password': 'ValidPass123!', 'confirm': 'ValidPass123!', 
+        'avatar': get_mock_file('malware.exe') 
     }, content_type='multipart/form-data')
+    
+    assert res.status_code == 400
+    assert "Invalid file type" in res.get_json()['message']
 
-    assert response.status_code == 400
-    assert b"Invalid file type" in response.data or b"Only images" in response.data
+
+# TC_REG_08
+@pytest.mark.parametrize("invalid_pass", [
+    "123456",        
+    "NoSymbol123",  
+    "short!1"        
+])
+def test_register_invalid_password_format(test_client, invalid_pass):
+    res = test_client.post('/api/register', data={
+        'fullname': 'Test', 'email': 'test@gmail.com', 'username': 'newuser',
+        'password': invalid_pass, 'confirm': invalid_pass, 'avatar': get_mock_file()
+    }, content_type='multipart/form-data')
+    
+    assert res.status_code == 400
+    assert "Invalid password format" in res.get_json()['message']
+
+
+# TC_LOG_01
+def test_login_success(test_client, mocker):
+    class FakeUser:
+        id = 1
+        username = 'validuser'
+        is_active = True
+        
+    mocker.patch('bapp.index.dao.auth_user', return_value=FakeUser())
+    mocker.patch('flask_login.login_user', return_value=True)
+    
+    res = test_client.post('/api/login', data={'username': 'validuser', 'password': 'CorrectPass123!'})
+    assert res.status_code == 200
+    assert res.get_json()['status'] == "success"
+
+
+# TC_LOG_02 & TC_LOG_03
+def test_login_failures(test_client, mocker):
+    mocker.patch('bapp.index.dao.auth_user', return_value=None) 
+    
+    res = test_client.post('/api/login', data={'username': 'wronguser', 'password': 'wrongpass'})
+    assert res.status_code == 400
+    assert "Invalid username or password" in res.get_json()['message']
+
+# TC_OUT_01
+def test_logout_success(test_client, mocker):
+    mocker.patch('flask_login.logout_user')
+    res = test_client.post('/api/logout')
+    
+    assert res.status_code == 200
+    assert "Signed out successfully" in res.get_json()['message']
+
+
+# TC_OUT_02
+def test_logout_session_invalidation(test_client, mocker):
+    class FakeUser:
+        is_authenticated = False 
+        
+    mocker.patch('flask_login.utils._get_user', return_value=FakeUser())
+    
+    res = test_client.post('/api/bookings', data={'field_id': '1', 'time_slots_id': '1', 'booking_date': '2026-12-31'})
+    
+    assert res.status_code == 401
+    assert "Please login" in res.get_json()['message']
