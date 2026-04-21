@@ -13,3 +13,8 @@ def calculate_duration(start_time, end_time):
     dt_end = datetime.datetime.combine(dummy_date, end_time)
     return (dt_end - dt_start).total_seconds() / 3600.0
 
+####################################
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS

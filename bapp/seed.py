@@ -10,7 +10,7 @@ def create_dummy_data():
 
         user1 = User(
             username='duyadmin',
-            password='123',
+            password='123456',
             fullname='Nguyễn Triệu Duy',
             email='duy@gmail.com',
             user_role=UserRole.ADMIN,
