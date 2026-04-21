@@ -1,11 +1,12 @@
 import { useState } from "react";
-import {CourtCard} from "../../components/ui/CourtCard.jsx";
-import {FilterBar} from "../../components/ui/FilterBar.jsx";
-import {EmptyState} from "../../components/ui/EmptyState.jsx";
-import {PageHeader} from "../../components/ui/PageHeader.jsx";
+import {CourtCard} from "./components/CourtCard.jsx";
+import {FilterBar} from "./components/FilterBar.jsx";
+import {PageHeader} from "../../../components/common/PageHeader.jsx";
+import "./home.css";
+import {EmptyState} from "../../../components/common/EmptyState.jsx";
 
 export function Home() {
-    const fields = [
+    const courts = [
         {
             "id": "c1",
             "name": "Sân bóng đá Mini A",
@@ -55,22 +56,31 @@ export function Home() {
 
     const [search, setSearch] = useState("");
     const [selectedSport, setSelectedSport] = useState("all");
-    const [selectedDate, setSelectedDate] = useState("");
 
-    const filteredFields = fields.filter(field => {
-        const matchSearch = field.name
+    const filteredFields = courts.filter(court => {
+        const matchSearch = court.name
             .toLowerCase()
             .includes(search.toLowerCase());
 
         const matchSport =
-            selectedSport === "all" || field.sport === selectedSport;
+            selectedSport === "all" || court.sport === selectedSport;
 
         return matchSearch && matchSport;
     });
 
+    const getToday = () => {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
+    const [selectedDate, setSelectedDate] = useState(getToday());
+
     return (
         <div className="container">
-            <PageHeader header="Find Your Field" text="Book your favorite sports field in just a few clicks" />
+            <PageHeader header="Find Your Field" text="Book your favorite sports court in just a few clicks" />
 
             <FilterBar
                 search={search}
@@ -82,12 +92,12 @@ export function Home() {
             />
 
             <div className="grid">
-                {filteredFields.map(field => (
-                    <CourtCard key={field.id} court={field} />
+                {filteredFields.map(court => (
+                    <CourtCard key={court.id} court={court} />
                 ))}
             </div>
 
-            {filteredFields.length === 0 && <EmptyState />}
+            {filteredFields.length === 0 && <EmptyState text="courts" /> }
         </div>
     );
 }

@@ -1,36 +1,32 @@
-import "./CourtCard.css";
-import {Button} from "./Button.jsx";
+import { Card, CardContent, CardFooter } from "../../../../components/common/Card.jsx";
+import {Button} from "../../../../components/common/Button.jsx";
+import {Badge} from "../../../../components/common/Badge.jsx";
+import {useNavigate} from "react-router-dom";
 
 export function CourtCard({ court }) {
+    const navigate = useNavigate();
     const sportIcons = {
         football: "⚽",
         badminton: "🏸",
-        tennis: "🎾"
+        tennis: "🎾",
     };
 
     return (
-        <div className="court-card">
-
-            {/* IMAGE / ICON */}
+        <Card className="court-card">
             <div className={`court-image ${court.sport}`}>
                 {sportIcons[court.sport]}
             </div>
 
-            {/* BODY */}
-            <div className="court-body">
-
-                {/* HEADER */}
+            <CardContent className="court-body">
                 <div className="court-header">
                     <h3 className="court-name">{court.name}</h3>
-
                     {court.available ? (
-                        <span className="badge badge-available">Available</span>
+                        <Badge variant="success">Available</Badge>
                     ) : (
-                        <span className="badge badge-booked">Full</span>
+                        <Badge variant="danger">Full</Badge>
                     )}
                 </div>
 
-                {/* INFO */}
                 <div className="court-info">
                     <div className="info-row">
                         <span>🏟️</span>
@@ -43,7 +39,6 @@ export function CourtCard({ court }) {
                     </div>
                 </div>
 
-                {/* PRICE + RATING */}
                 <div className="court-meta">
                     <div>
                         <div className="text-muted small">Price</div>
@@ -58,19 +53,22 @@ export function CourtCard({ court }) {
                         <div>⭐ {court.rating}</div>
                     </div>
                 </div>
+            </CardContent>
 
-                {/* BUTTON */}
+            <CardFooter>
                 {court.available ? (
-                    <Button className="btn-primary btn-full">
+                    <Button
+                        className="btn-primary btn-full"
+                        onClick={() => navigate(`court/${court.id}`)}
+                    >
                         Book Now
                     </Button>
                 ) : (
-                    <button className="btn btn-disabled" disabled>
+                    <Button className="btn-disabled btn-full">
                         Unavailable
-                    </button>
+                    </Button>
                 )}
-
-            </div>
-        </div>
+            </CardFooter>
+        </Card>
     );
 }

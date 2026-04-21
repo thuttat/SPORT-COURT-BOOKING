@@ -5,6 +5,7 @@
     cursor: pointer;
     border: none;
     transition: 0.2s;
+    background: white;
 }
 
 .btn-primary {
@@ -28,4 +29,28 @@
 .btn-danger {
     background: #ef4444 !important;
     color: white;
+}
+
+.btn-disabled {
+    background: var(--booked);
+    color: #888;
+    cursor: not-allowed;
+}
+
+.tab-btn {
+    background: transparent;
+    border: none;
+    color: #64748b;
+    padding: 10px 16px;
+    border-radius: 10px 10px 0 0;
+}
+
+.tab-btn:hover {
+    background: var(--secondary);
+}
+
+.tab-btn.active {
+    color: var(--primary);
+    border-bottom: 2px solid var(--primary);
+    background: rgba(52, 211, 153, 0.08);
 }
