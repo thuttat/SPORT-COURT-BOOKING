@@ -55,7 +55,7 @@ def login_my_user():
         return jsonify({
             "status": "success",
             "message": "Log in successfully!",
-            "data": {"id": user.id, "username": user.username}
+            "data": {"id": user.id, "fullname": user.fullname, "username": user.username, "avatar": user.avatar, "role": user.user_role.name}
         }), 200
     return jsonify({"status": "error", "message": "Invalid username or password!"}), 400
 

@@ -1,6 +1,6 @@
 import {NavLink, useNavigate} from "react-router-dom";
 import { Button } from "./Button.jsx";
-import {Calendar, House, LayoutDashboard, MapPin, UserPen} from "lucide-react";
+import {Calendar, House, LayoutDashboard, MapPin, User, UserPen} from "lucide-react";
 import {useAuth} from "../../services/auth/AuthContext.jsx";
 import "../styles/header.css"
 
@@ -56,10 +56,20 @@ export function Header() {
                 <div className="user-section">
                     {user ? (
                         <>
+                            {user.avatar ? (
+                                <div className="avatar">
+                                    <img src={user.avatar} alt="User Avatar" className="avatar-img" />
+                                </div>
+                            ) : (
+                                <div className="avatar-default">
+                                    <User size={16} />
+                                </div>
+                            )}
                             <div className="user-info">
-                                <div className="user-name">{user.name}</div>
-                                <div className="text-muted small">{user.email}</div>
+                                <h4>{user ? (user.fullname || user.username) : "Loading..."}</h4>
+                                <span>{user ? user.email : ""}</span>
                             </div>
+
                             <Button className="btn-danger" onClick={handleLogout}>
                                 Log out
                             </Button>

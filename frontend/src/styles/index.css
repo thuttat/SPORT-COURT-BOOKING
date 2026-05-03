@@ -67,6 +67,12 @@ body {
   border-color: var(--primary);
 }
 
+.error {
+  color: var(--destructive);
+  text-align: center;
+  font-size: 14px;
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));

@@ -1,46 +1,72 @@
 import React, { createContext, useContext, useState } from "react";
 
 const AuthContext = createContext();
+const API_URL = "http://localhost:5000/api";
 
 export function AuthProvider({ children }) {
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState(() => {
+        const savedUser = localStorage.getItem("user");
+        return savedUser ? JSON.parse(savedUser) : null;
+    });
 
-    const login = async (email, password) => {
-        await new Promise(resolve => setTimeout(resolve, 500));
+    const login = async (username, password) => {
+        const formData = new FormData();
+        formData.append("username", username);
+        formData.append("password", password);
 
-        if (email === "admin@sports.com") {
-            setUser({
-                id: "1",
-                name: "Admin User",
-                email: email,
-                role: "admin"
-            });
-        } else {
-            setUser({
-                id: "2",
-                name: email.split("@")[0],
-                email: email,
-                role: "user"
-            });
+        const response = await fetch(`${API_URL}/login`, {
+            method: "POST",
+            body: formData,
+        })
+
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(data.message || "Invalid credentials!");
         }
+
+        const userData = data.data;
+        setUser(userData);
+        localStorage.setItem("accessToken", "flask-session-active");
+        localStorage.setItem("role", userData.role);
+        localStorage.setItem("user", JSON.stringify(userData));
+
+        return userData;
     };
 
-    const register = async (name, email, password) => {
-        await new Promise(resolve => setTimeout(resolve, 500));
+    const register = async (fullname, username, email, password, confirm, avatarFile) => {
+        const formData = new FormData();
+        formData.append("fullname", fullname);
+        formData.append("email", email);
+        formData.append("username", username);
+        formData.append("password", password);
+        formData.append("confirm", confirm);
+        formData.append("avatar", avatarFile);
 
-        setUser({
-            id: Date.now().toString(),
-            name,
-            email,
-            role: "user"
+        const response = await fetch(`${API_URL}/register`, {
+            method: "POST",
+            body: formData,
         });
+
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(data.message || "Registration failed!");
+        }
+        return data;
     };
 
-    const logout = () => {
+    const logout = async () => {
+        try {
+            await fetch(`${API_URL}/logout`, { method: "POST" });
+        } catch (error) {
+            console.error("Logout error", error);
+        }
         setUser(null);
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("role");
+        localStorage.removeItem("user");
     };
 
-    const isAdmin = user?.role === "admin";
+    const isAdmin = user?.role === "ADMIN";
 
     return (
         <AuthContext.Provider

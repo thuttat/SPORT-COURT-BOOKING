@@ -4,29 +4,31 @@ import {useNavigate} from "react-router-dom";
 import {useAuth} from "../../services/auth/AuthContext.jsx";
 
 export function Login() {
-    const [email, setEmail] = useState("");
+    const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
+    const [errorMsg, setErrorMsg] = useState("");
     const navigate = useNavigate();
     const {login} = useAuth();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!email || !password) {
-            alert("Please enter your email and password!");
+        setErrorMsg("");
+        if (!username || !password) {
+            alert("Please enter your username and password!");
             return;
         }
         setLoading(true);
         try {
-            await login(email, password);
+            const userData = await login(username, password);
 
-            if (email === "admin@sports.com") {
+            if (userData.role === "ADMIN") {
                 navigate("/admin/dashboard");
             } else {
                 navigate("/");
             }
         } catch (error) {
-            console.error("Login error", error);
+            setErrorMsg(error.message);
         } finally {
             setLoading(false);
         }
@@ -47,15 +49,17 @@ export function Login() {
                         </p>
                     </div>
 
+                    {errorMsg && (<p className="error">{errorMsg}</p>)}
+
                     <form className="login-form" onSubmit={handleSubmit}>
                         <div className="form-group">
-                            <label>Email</label>
+                            <label>Username</label>
                             <input
-                                type="email"
+                                type="text"
                                 className="input"
-                                placeholder="you@example.com"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
+                                placeholder="Enter your username"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
                             />
                         </div>
 
