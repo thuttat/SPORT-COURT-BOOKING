@@ -1,5 +1,8 @@
 import pytest
+from selenium.webdriver.chrome.service import Service
+
 from bapp import app as bapp_app, db
+from selenium import webdriver
 
 @pytest.fixture
 def test_app():
@@ -19,3 +22,11 @@ def test_client(test_app):
 @pytest.fixture
 def test_session(test_app):
     yield db.session
+
+@pytest.fixture
+def driver():
+    service = Service(executable_path='../.venv/chromedriver.exe')
+    driver = webdriver.Chrome(service=service)
+    yield driver
+    driver.quit()
+
