@@ -154,3 +154,8 @@ body {
   margin-top: 20px;
 }
 
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: #64748b;
+}

@@ -1,4 +1,5 @@
 import { Button } from "../../../../components/common/Button.jsx";
+import {formatTodayString} from "../../../../utils/formatters.js";
 
 export function FilterBar({
                               search,
@@ -8,12 +9,6 @@ export function FilterBar({
                               selectedDate,
                               setSelectedDate
                           }) {
-
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
-    const localTodayString = `${year}-${month}-${day}`;
 
     return (
         <div className="filter-bar">
@@ -60,7 +55,7 @@ export function FilterBar({
                     type="date"
                     className="input date-input"
                     value={selectedDate}
-                    min={localTodayString}
+                    min={formatTodayString()}
                     onChange={(e) => setSelectedDate(e.target.value)}
                 />
             </div>

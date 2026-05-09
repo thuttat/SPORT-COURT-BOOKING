@@ -1,45 +1,65 @@
 import { useParams, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { ArrowLeft } from "lucide-react";
 import { Card, CardContent } from "../../../components/common/Card.jsx";
 import { Button } from "../../../components/common/Button.jsx";
-import { Badge } from "../../../components/common/Badge.jsx";
-import {ArrowLeft} from "lucide-react";
+import { useBooking } from "../../../services/booking/useBooking.js";
+import { BookingDetailHeader } from "./components/BookingDetailHeader.jsx";
+import { BookingDetailInfo } from "./components/BookingDetailInfo.jsx";
+import "./bookingDetails.css";
 
 export function BookingDetails() {
     const { id } = useParams();
     const navigate = useNavigate();
+    const { bookingDetails, detailLoading, fetchBookingDetails } = useBooking();
 
-    const booking = {
-        id,
-        fieldName: "Sân bóng đá Mini A",
-        sport: "football",
-        date: "2026-04-10",
-        timeSlots: ["08:00", "09:00"],
-        status: "upcoming"
-    };
+    useEffect(() => {
+        if (id) {
+            fetchBookingDetails(id);
+        }
+    }, [id]);
+
+    if (detailLoading || !bookingDetails) {
+        return (
+            <div className="container loading">
+                Loading...
+            </div>
+        );
+    }
+
+    const sport = bookingDetails.field_type ? bookingDetails.field_type.toLowerCase() : 'default';
 
     return (
-        <div className="container">
-            <Button onClick={() => navigate(-1)}
-                    className="back-btn"
-                    style={{marginBottom: "8px"}}
+        <div className="container booking-details-container">
+            <Button
+                onClick={() => navigate(-1)}
+                className="btn-outline back-btn back-button-custom"
             >
                 <ArrowLeft size={16}/> Back
             </Button>
 
             <Card>
-                <CardContent>
-                    <h2>{booking.fieldName}</h2>
-                    <Badge>{booking.sport}</Badge>
+                <CardContent className="details-card-content">
+                    <BookingDetailHeader
+                        sport={sport}
+                        fieldName={bookingDetails.field_name}
+                        status={bookingDetails.status}
+                    />
 
-                    <p>Date: {booking.date}</p>
-                    <p>Slots:</p>
-
-                    <div style={{ display: "flex", gap: "8px" }}>
-                        {booking.timeSlots.map(slot => (
-                            <Badge key={slot}>{slot}</Badge>
-                        ))}
-                    </div>
+                    <BookingDetailInfo
+                        sport={sport}
+                        bookingDate={bookingDetails.booking_date}
+                        timeSlot={bookingDetails.time_slot}
+                        createdAt={bookingDetails.created_at}
+                        totalPrice={bookingDetails.total_price}
+                    />
                 </CardContent>
+
+                {bookingDetails.status === "PENDING" && (
+                    <Button className="btn-danger">
+                        Cancel
+                    </Button>
+                )}
             </Card>
         </div>
     );

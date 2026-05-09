@@ -146,6 +146,7 @@ def get_my_bookings():
         results.append({
             "id": b.id,
             "field_name": b.field.name,
+            "field_type": b.field.field_type.name,
             "booking_date": b.booking_date.strftime("%Y-%m-%d"),
             "time_slot": b.time_slot.name,
             "total_price": float(b.total_price),
@@ -186,6 +187,7 @@ def get_my_booking_details(id):
         "data": {
             "id": booking.id,
             "field_name": booking.field.name,
+            "field_type": booking.field.field_type.name,
             "booking_date": booking.booking_date.strftime("%Y-%m-%d"),
             "time_slot": booking.time_slot.name,
             "total_price": float(booking.total_price),

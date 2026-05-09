@@ -1,7 +1,7 @@
 import {Button} from "../../components/common/Button.jsx";
 import {useNavigate} from "react-router-dom";
-import {useAuth} from "../../services/auth/AuthContext.jsx";
 import {useState} from "react";
+import {useAuth} from "../../services/auth/useAuth.js";
 
 export function Register() {
     const [fullname, setFullname] = useState("");

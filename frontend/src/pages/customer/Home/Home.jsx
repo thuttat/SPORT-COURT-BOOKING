@@ -4,6 +4,7 @@ import {FilterBar} from "./components/FilterBar.jsx";
 import {PageHeader} from "../../../components/common/PageHeader.jsx";
 import "./home.css";
 import {EmptyState} from "../../../components/common/EmptyState.jsx";
+import {formatTodayString} from "../../../utils/formatters.js";
 
 export function Home() {
     const courts = [
@@ -56,6 +57,7 @@ export function Home() {
 
     const [search, setSearch] = useState("");
     const [selectedSport, setSelectedSport] = useState("all");
+    const [selectedDate, setSelectedDate] = useState(formatTodayString());
 
     const filteredFields = courts.filter(court => {
         const matchSearch = court.name
@@ -67,16 +69,6 @@ export function Home() {
 
         return matchSearch && matchSport;
     });
-
-    const getToday = () => {
-        const today = new Date();
-        const year = today.getFullYear();
-        const month = String(today.getMonth() + 1).padStart(2, '0');
-        const day = String(today.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    };
-
-    const [selectedDate, setSelectedDate] = useState(getToday());
 
     return (
         <div className="container">
