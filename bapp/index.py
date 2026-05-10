@@ -1,5 +1,5 @@
 import math
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta,  timezone
 import cloudinary
 import cloudinary.uploader
 import re
@@ -250,7 +250,7 @@ def create_booking():
         db.session.rollback()
         return jsonify({"status": "error", "message": str(e)}), 500
 
-@app.route('/api/bookings/<int:booking_id>/cancel', methods=['PATCH'])
+@app.route('/api/bookings/<int:booking_id>', methods=['DELETE'])
 @login_required
 def cancel_booking(booking_id):
     booking_order = dao.get_booking_by_id(booking_id)
@@ -264,7 +264,7 @@ def cancel_booking(booking_id):
         return jsonify({"status": "error", "message": "This booking is already cancelled."}), 400
 
     start_datetime = datetime.combine(booking_order.booking_date, booking_order.time_slot.start_time)
-    now_in_vn = datetime.utcnow() + timedelta(hours=7)
+    now_in_vn = datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(hours=7)
     time_diff = start_datetime - now_in_vn
     minutes_diff = time_diff.total_seconds() / 60
     if minutes_diff < 0:
@@ -283,6 +283,30 @@ def cancel_booking(booking_id):
     }), 200
 
 ########################################################################
+@app.route('/api/fields', methods=['GET'])
+def get_all_active_fields_for_customer():
+    page = request.args.get('page', 1, type=int)
+    page_size = app.config.get('PAGE_SIZE', 10)
+
+    fields = dao.get_active_fields_paginated(page=page, page_size=page_size)
+    
+    results = []
+    for f in fields:
+        results.append({
+            "id": f.id,
+            "name": f.name,
+            "field_type": f.field_type.name,
+            "price_per_hour": float(f.price_per_hour),
+            "description": f.description,
+            "image": f.image
+        })
+        
+    return jsonify({
+        "status": "success",
+        "data": results,
+        "page": page
+    }), 200
+
 
 @app.route('/api/my-fields', methods=['GET'])
 @login_required
@@ -316,6 +340,30 @@ def get_my_fields():
         "data": results,
         "total_count": dao.count_my_fields(current_user.id),
         "page": page
+    }), 200
+
+
+
+@app.route('/api/fields/<int:field_id>/slots', methods=['GET'])
+def get_slots_by_date(field_id):
+    date_str = request.args.get('date') 
+    if not date_str:
+        return jsonify({"status": "error", "message": "Date is required"}), 400
+        
+    booking_date = utils.parse_date(date_str)
+    all_slots = dao.get_all_time_slots()
+    
+    results = []
+    for s in all_slots:
+        available = dao.is_field_available(field_id, booking_date, s.id)
+        results.append({
+            "id": s.id,
+            "display": f"{s.start_time.strftime('%H:%M')} - {s.end_time.strftime('%H:%M')}",
+            "is_available": available
+        })
+    return jsonify({
+        "status": "success", 
+        "data": results
     }), 200
 
 
