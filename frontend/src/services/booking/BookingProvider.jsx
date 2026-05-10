@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { BookingContext } from "./bookingContext";
-import {getBookingDetailsRequest, getMyBookingsRequest} from "../apis.js";
+import {cancelBookingRequest, getBookingDetailsRequest, getMyBookingsRequest} from "../apis.js";
 
 export function BookingProvider({ children }) {
     const [bookings, setBookings] = useState([]);
@@ -35,10 +35,21 @@ export function BookingProvider({ children }) {
         }
     }
 
+    const cancelBooking = async (id) => {
+        try {
+            const response = await cancelBookingRequest(id);
+            return response.data;
+        } catch (error) {
+            const errorMsg = error.response?.data?.message;
+            throw new Error(errorMsg);
+        }
+    }
+
     return (
         <BookingContext.Provider value={{
             bookings, pagination, loading, fetchMyBookings,
             bookingDetails, detailLoading, fetchBookingDetails,
+            cancelBooking
         }}>
             {children}
         </BookingContext.Provider>

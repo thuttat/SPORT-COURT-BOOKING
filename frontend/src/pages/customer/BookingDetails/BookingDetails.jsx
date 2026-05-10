@@ -11,13 +11,26 @@ import "./bookingDetails.css";
 export function BookingDetails() {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { bookingDetails, detailLoading, fetchBookingDetails } = useBooking();
+    const { bookingDetails, detailLoading, fetchBookingDetails, cancelBooking } = useBooking();
 
     useEffect(() => {
         if (id) {
             fetchBookingDetails(id);
         }
     }, [id]);
+
+    const handleCancel = async () => {
+        const isConfirmed = window.confirm("Are you sure you want to cancel this court reservation?");
+        if (isConfirmed) {
+            try {
+                await cancelBooking(id);
+                alert("Cancelled successfully!");
+                fetchBookingDetails(id);
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+            }
+        }
+    };
 
     if (detailLoading || !bookingDetails) {
         return (
@@ -56,7 +69,7 @@ export function BookingDetails() {
                 </CardContent>
 
                 {bookingDetails.status === "PENDING" && (
-                    <Button className="btn-danger">
+                    <Button className="btn-danger" onClick={handleCancel}>
                         Cancel
                     </Button>
                 )}

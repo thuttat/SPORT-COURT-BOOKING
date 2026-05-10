@@ -51,4 +51,10 @@ export const getBookingDetailsRequest = (id) => {
     });
 };
 
+export const cancelBookingRequest = (id) => {
+    return api.patch(endpoints.cancelBooking(id), {
+        withCredentials: true
+    });
+};
+
 export default api;
