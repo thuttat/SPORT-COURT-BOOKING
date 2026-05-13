@@ -1,5 +1,6 @@
 import pytest
 from selenium.webdriver.chrome.service import Service
+import os
 
 from bapp import app as bapp_app, db
 from selenium import webdriver
@@ -25,7 +26,10 @@ def test_session(test_app):
 
 @pytest.fixture
 def driver():
-    service = Service(executable_path='../.venv/chromedriver.exe')
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    driver_path = os.path.join(base_dir, '.venv', 'chromedriver.exe')
+
+    service = Service(executable_path=driver_path)
     driver = webdriver.Chrome(service=service)
     yield driver
     driver.quit()

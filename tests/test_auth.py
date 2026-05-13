@@ -131,7 +131,10 @@ def test_login_success(test_client, mocker):
     class FakeUser:
         id = 1
         username = 'validuser'
+        fullname = 'Valid User'
+        avatar = 'https://fake.url/avatar.png'
         is_active = True
+        user_role = UserRole.USER
 
         def get_id(self):
             return str(self.id)
@@ -144,11 +147,25 @@ def test_login_success(test_client, mocker):
     assert res.get_json()['status'] == "success"
 
 
-# TC_LOG_02 & TC_LOG_03
-def test_login_failures(test_client, mocker):
+# TC_LOG_02
+def test_login_wrong_password(test_client, mocker):
     mocker.patch('bapp.index.dao.auth_user', return_value=None)
 
-    res = test_client.post('/api/login', data={'username': 'wronguser', 'password': 'wrongpass'})
+    res = test_client.post('/api/login', data={
+        'username': 'validuser',
+        'password': 'WrongPass999!'
+    })
+    assert res.status_code == 400
+    assert "Invalid username or password" in res.get_json()['message']
+
+# TC_LOG_03
+def test_login_nonexistent_username(test_client, mocker):
+    mocker.patch('bapp.index.dao.auth_user', return_value=None)
+
+    res = test_client.post('/api/login', data={
+        'username': 'userkhongtontai',
+        'password': 'AnyPass123!'
+    })
     assert res.status_code == 400
     assert "Invalid username or password" in res.get_json()['message']
 
