@@ -109,6 +109,16 @@ def get_fields_by_user_paginated(user_id, page=1, page_size=6):
                               Field.is_active == True).offset(offset).limit(ps).all()
 
 
+def get_active_fields_paginated(page=1, page_size=10):
+    return Field.query.filter_by(is_active=True).paginate(page=page, per_page=page_size, error_out=False).items
+
+def get_field_by_id(field_id):
+    return Field.query.get(field_id)
+
+def get_all_time_slots():
+    return TimeSlots.query.order_by(TimeSlots.start_time).all()
+
+
 def add_field(name, field_type, price_per_hour, description, image, user_id):
     new_field = Field(
         name=name.strip(),
