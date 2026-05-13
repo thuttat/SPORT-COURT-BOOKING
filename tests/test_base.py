@@ -2,8 +2,13 @@ import pytest
 from selenium.webdriver.chrome.service import Service
 import os
 
+os.environ["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
+os.environ["TESTING"] = "true"
+
 from bapp import app as bapp_app, db
 from selenium import webdriver
+
+
 
 @pytest.fixture
 def test_app():
