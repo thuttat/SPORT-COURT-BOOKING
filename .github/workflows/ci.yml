@@ -2,7 +2,7 @@ name: Flask Automated Testing
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "**" ]
   pull_request:
     branches: [ "main" ]
 
@@ -28,5 +28,6 @@ jobs:
     - name: Run tests with pytest
       env:
         PYTHONPATH: .
+        DATABASE_URL: "sqlite:///:memory:"
       run: |
         python -m pytest tests/ -v
