@@ -14,6 +14,8 @@ export const endpoints = {
     myBookings: "/my-bookings",
     bookingDetails: (id) => `/my-bookings/${id}`,
     cancelBooking: (id) => `/bookings/${id}/cancel`,
+    fields: "/fields",
+    fieldSlots: (id) => `/fields/${id}/slots`,
 };
 
 export const loginRequest = (username, password) => {
@@ -55,6 +57,14 @@ export const cancelBookingRequest = (id) => {
     return api.patch(endpoints.cancelBooking(id), {
         withCredentials: true
     });
+};
+
+export const getAllFieldsRequest = (page = 1, date) => {
+    return api.get(endpoints.fields, { params: { page, date } });
+};
+
+export const getFieldSlotsRequest = (fieldId, date) => {
+    return api.get(endpoints.fieldSlots(fieldId), { params: { date } });
 };
 
 export default api;

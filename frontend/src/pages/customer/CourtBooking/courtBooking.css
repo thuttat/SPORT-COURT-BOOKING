@@ -103,12 +103,6 @@
     font-size: 14px;
 }
 
-.selected-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-}
-
 .btn-full {
     width: 100%;
 }
@@ -118,4 +112,18 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
+}
+
+.slot.occupied,
+.slot:disabled {
+    background: #f1f5f9;
+    color: #94a3b8;
+    border: 1px dashed #cbd5e1;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.slot:disabled:hover {
+    transform: none;
+    background: #f1f5f9;
 }

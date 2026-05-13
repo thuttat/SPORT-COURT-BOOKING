@@ -10,9 +10,13 @@ export function CourtCard({ court }) {
 
     return (
         <Card className="court-card">
-            <div className={`court-image ${court.sport}`}>
-                {sportIcons[court.sport]}
-            </div>
+            {court.image ? (
+                <img src={court.image} alt="court-image" className="court-image"/>
+            ) : (
+                <div className={`court-image ${court.field_type.toLowerCase()}`}>
+                    {sportIcons[court.field_type.toLowerCase()]}
+                </div>
+            )}
 
             <CardContent className="court-body">
                 <div className="court-header">
@@ -27,12 +31,12 @@ export function CourtCard({ court }) {
                 <div className="court-info">
                     <div className="info-row">
                         <span>🏟️</span>
-                        <span>{capitalizeFirstLetter(court.sport)}</span>
+                        <span>{capitalizeFirstLetter(court.field_type)}</span>
                     </div>
 
                     <div className="info-row">
-                        <span>📍</span>
-                        <span>{court.location}</span>
+                        <span>✏️</span>
+                        <span>{court.description}</span>
                     </div>
                 </div>
 
@@ -40,15 +44,15 @@ export function CourtCard({ court }) {
                     <div>
                         <div className="text-muted small">Price</div>
                         <div className="price">
-                            {formatCurrency(court.price)}
+                            {formatCurrency(court.price_per_hour)}
                             <span className="text-muted small"> /h</span>
                         </div>
                     </div>
 
-                    <div className="rating">
-                        <div className="text-muted small">Rating</div>
-                        <div>⭐ {court.rating}</div>
-                    </div>
+                    {/*<div className="rating">*/}
+                    {/*    <div className="text-muted small">Rating</div>*/}
+                    {/*    <div>⭐ {court.rating}</div>*/}
+                    {/*</div>*/}
                 </div>
             </CardContent>
 
