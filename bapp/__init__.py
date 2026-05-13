@@ -1,3 +1,4 @@
+import os
 from urllib.parse import quote
 
 import cloudinary
@@ -9,7 +10,11 @@ from flasgger import Swagger
 
 app = Flask(__name__)
 app.secret_key = 'jfroooewq920jvjdftd$#%^7cnnmm'
-app.config["SQLALCHEMY_DATABASE_URI"] = 'mysql+pymysql://root:%s@localhost/sportbookingdb' % quote('admin123@')
+# app.config["SQLALCHEMY_DATABASE_URI"] = 'mysql+pymysql://root:%s@localhost/sportbookingdb' % quote('admin123@')
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
+    "DATABASE_URL",
+    'mysql+pymysql://root:%s@localhost/sportbookingdb' % quote('admin123@')
+    )
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
 app.config['SQLALCHEMY_ECHO'] = False
 app.config['PAGE_SIZE']=5 
