@@ -105,8 +105,8 @@ class BookingDetail(BaseModel):
     quantity = Column(Integer, nullable=False, default=1)
     unit_price = Column(Float, nullable=False)
 
-    booking_id = Column(Integer, ForeignKey('booking.id'), primary_key=True)
-    service_id = Column(Integer, ForeignKey('service.id'), primary_key=True)
+    booking_id = Column(Integer, ForeignKey('booking.id'), nullable=False)
+    service_id = Column(Integer, ForeignKey('service.id'), nullable=False)
     booking = relationship('Booking', backref='details')
 
 if __name__ == '__main__':
