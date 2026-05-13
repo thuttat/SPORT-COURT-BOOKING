@@ -100,7 +100,7 @@ class Service(BaseModel):
     booking_details = relationship('BookingDetail', backref='service', lazy=True)
 
 
-class BookingDetail(db.Model):
+class BookingDetail(BaseModel):
     __tablename__ = 'booking_detail'
     quantity = Column(Integer, nullable=False, default=1)
     unit_price = Column(Float, nullable=False)
