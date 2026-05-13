@@ -8,6 +8,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 from flasgger import Swagger
 from flask_cors import CORS
+import os
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
@@ -15,7 +16,7 @@ app.secret_key = 'jfroooewq920jvjdftd$#%^7cnnmm'
 # app.config["SQLALCHEMY_DATABASE_URI"] = 'mysql+pymysql://root:%s@localhost/sportbookingdb' % quote('admin123@')
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
     "DATABASE_URL",
-    'mysql+pymysql://root:%s@localhost/sportbookingdb' % quote('admin123@')
+    'mysql+pymysql://root:%s@localhost/sport_booking_db' % quote('Baotran1805@')
     )
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
 app.config['SQLALCHEMY_ECHO'] = False
