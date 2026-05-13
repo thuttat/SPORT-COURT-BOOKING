@@ -97,8 +97,8 @@ def register_user():
     try:
         res = cloudinary.uploader.upload(avatar)
         avatar_path = res['secure_url']
-        role = request.form.get('user_role', 'USER').upper()
-        role_enum = UserRole.ADMIN if role == 'ADMIN' else UserRole.USER
+        # role = request.form.get('user_role', 'USER').upper()
+        # role_enum = UserRole.ADMIN if role == 'ADMIN' else UserRole.USER
 
         dao.add_user(
             fullname=fullname,
@@ -106,7 +106,7 @@ def register_user():
             password=password,
             email=email,
             avatar=avatar_path,
-            user_role=role_enum
+            user_role=UserRole.USER
         )
         return jsonify({
             "status": "success",
