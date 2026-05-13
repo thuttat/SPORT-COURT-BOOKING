@@ -25,8 +25,21 @@ jobs:
         pip install pytest
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
+    - name: Install Chrome and ChromeDriver
+      uses: browser-actions/setup-chrome@v1
+
     - name: Run tests with pytest
       env:
         PYTHONPATH: .
+        SQLALCHEMY_DATABASE_URI: sqlite:///:memory:
+        TESTING: "true"
       run: |
-        python -m pytest tests/ -v
+        python -m pytest tests/ -v --ignore=tests/test_sel.py
+
+    - name: Run Selenium tests
+      env:
+        PYTHONPATH: .
+        SQLALCHEMY_DATABASE_URI: sqlite:///:memory:
+        TESTING: "true"
+      run: |
+        python -m pytest tests/test_sel.py -v
