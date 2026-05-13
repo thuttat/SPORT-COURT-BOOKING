@@ -1,8 +1,8 @@
 import {NavLink, useNavigate} from "react-router-dom";
 import { Button } from "./Button.jsx";
 import {Calendar, House, LayoutDashboard, MapPin, User, UserPen} from "lucide-react";
-import {useAuth} from "../../services/auth/AuthContext.jsx";
 import "../styles/header.css"
+import {useAuth} from "../../services/auth/useAuth.js";
 
 export function Header() {
     const navigate = useNavigate();

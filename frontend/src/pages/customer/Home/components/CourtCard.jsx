@@ -2,14 +2,11 @@ import { Card, CardContent, CardFooter } from "../../../../components/common/Car
 import {Button} from "../../../../components/common/Button.jsx";
 import {Badge} from "../../../../components/common/Badge.jsx";
 import {useNavigate} from "react-router-dom";
+import {sportIcons} from "../../../../utils/constants.jsx";
+import {capitalizeFirstLetter, formatCurrency} from "../../../../utils/formatters.js";
 
 export function CourtCard({ court }) {
     const navigate = useNavigate();
-    const sportIcons = {
-        football: "⚽",
-        badminton: "🏸",
-        tennis: "🎾",
-    };
 
     return (
         <Card className="court-card">
@@ -30,7 +27,7 @@ export function CourtCard({ court }) {
                 <div className="court-info">
                     <div className="info-row">
                         <span>🏟️</span>
-                        <span>{court.sport}</span>
+                        <span>{capitalizeFirstLetter(court.sport)}</span>
                     </div>
 
                     <div className="info-row">
@@ -43,7 +40,7 @@ export function CourtCard({ court }) {
                     <div>
                         <div className="text-muted small">Price</div>
                         <div className="price">
-                            {court.price.toLocaleString()}₫
+                            {formatCurrency(court.price)}
                             <span className="text-muted small"> /h</span>
                         </div>
                     </div>

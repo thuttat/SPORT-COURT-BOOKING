@@ -1,7 +1,7 @@
 import {Button} from "../../components/common/Button.jsx";
 import {useState} from "react";
 import {useNavigate} from "react-router-dom";
-import {useAuth} from "../../services/auth/AuthContext.jsx";
+import {useAuth} from "../../services/auth/useAuth.js";
 
 export function Login() {
     const [username, setUsername] = useState("");
