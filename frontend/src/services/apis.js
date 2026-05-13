@@ -12,8 +12,9 @@ export const endpoints = {
     register: "/register",
     logout: "/logout",
     myBookings: "/my-bookings",
+    createBooking: "/bookings",
     bookingDetails: (id) => `/my-bookings/${id}`,
-    cancelBooking: (id) => `/bookings/${id}/cancel`,
+    cancelBooking: (id) => `/bookings/${id}`,
     fields: "/fields",
     fieldSlots: (id) => `/fields/${id}/slots`,
 };
@@ -47,6 +48,16 @@ export const getMyBookingsRequest = (page = 1) => {
     });
 };
 
+export const createBookingRequest = (fieldId, timeSlotsId, bookingDate) => {
+    const formData = new FormData();
+    formData.append("field_id", fieldId);
+    formData.append("time_slots_id", timeSlotsId);
+    formData.append("booking_date", bookingDate);
+    return api.post(endpoints.createBooking, formData, {
+        withCredentials: true
+    });
+};
+
 export const getBookingDetailsRequest = (id) => {
     return api.get(endpoints.bookingDetails(id), {
         withCredentials: true
@@ -54,7 +65,7 @@ export const getBookingDetailsRequest = (id) => {
 };
 
 export const cancelBookingRequest = (id) => {
-    return api.patch(endpoints.cancelBooking(id), {
+    return api.delete(endpoints.cancelBooking(id), {
         withCredentials: true
     });
 };

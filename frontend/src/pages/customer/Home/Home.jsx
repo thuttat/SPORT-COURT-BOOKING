@@ -6,12 +6,17 @@ import "./home.css";
 import {EmptyState} from "../../../components/common/EmptyState.jsx";
 import {formatTodayString} from "../../../utils/formatters.js";
 import {useField} from "../../../services/field/useField.js";
+import {Pagination} from "../../../components/common/Pagination.jsx";
 
 export function Home() {
-    const {fields, loadingFields, fetchFields} = useField();
+    const {fields, loadingFields, fetchFields, fieldPagination} = useField();
     const [search, setSearch] = useState("");
     const [selectedSport, setSelectedSport] = useState("all");
     const [selectedDate, setSelectedDate] = useState(formatTodayString());
+
+    const handlePageChange = (newPage) => {
+        fetchFields(newPage, selectedDate);
+    }
 
     useEffect(() => {
         fetchFields(1, selectedDate);
@@ -48,11 +53,17 @@ export function Home() {
                 <>
                     <div className="grid">
                         {filteredFields.map(court => (
-                            <CourtCard key={court.id} court={court} />
+                            <CourtCard key={court.id} court={court} selectedDate={selectedDate} />
                         ))}
                     </div>
 
                     {filteredFields.length === 0 && <EmptyState text="courts" /> }
+
+                    <Pagination
+                        currentPage={fieldPagination?.current_page}
+                        totalPages={fieldPagination?.total_pages}
+                        onPageChange={handlePageChange}
+                    />
                 </>
             )}
         </div>

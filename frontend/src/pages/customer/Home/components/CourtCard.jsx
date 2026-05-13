@@ -5,7 +5,7 @@ import {useNavigate} from "react-router-dom";
 import {sportIcons} from "../../../../utils/constants.jsx";
 import {capitalizeFirstLetter, formatCurrency} from "../../../../utils/formatters.js";
 
-export function CourtCard({ court }) {
+export function CourtCard({ court, selectedDate }) {
     const navigate = useNavigate();
 
     return (
@@ -21,7 +21,7 @@ export function CourtCard({ court }) {
             <CardContent className="court-body">
                 <div className="court-header">
                     <h3 className="court-name">{court.name}</h3>
-                    {court.available ? (
+                    {court.is_available ? (
                         <Badge variant="success">Available</Badge>
                     ) : (
                         <Badge variant="danger">Full</Badge>
@@ -57,10 +57,10 @@ export function CourtCard({ court }) {
             </CardContent>
 
             <CardFooter>
-                {court.available ? (
+                {court.is_available ? (
                     <Button
                         className="btn-primary btn-full"
-                        onClick={() => navigate(`court/${court.id}`)}
+                        onClick={() => navigate(`court/${court.id}`, {state: {preselectedDate: selectedDate}})}
                     >
                         Book Now
                     </Button>

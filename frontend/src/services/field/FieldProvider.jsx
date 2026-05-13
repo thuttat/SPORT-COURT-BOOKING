@@ -7,12 +7,14 @@ export function FieldProvider({ children }) {
     const [loadingFields, setLoadingFields] = useState(false);
     const [slots, setSlots] = useState([]);
     const [loadingSlots, setLoadingSlots] = useState(false);
+    const [fieldPagination, setFieldPagination] = useState({});
 
     const fetchFields = async (page = 1, date) => {
         setLoadingFields(true);
         try {
             const response = await getAllFieldsRequest(page, date);
             setFields(response.data.data);
+            setFieldPagination(response.data.pagination);
         } catch (error) {
             console.error("Error fetching fields", error);
         } finally {
@@ -34,7 +36,7 @@ export function FieldProvider({ children }) {
 
     return (
         <FieldContext.Provider value={{
-            fields, loadingFields, fetchFields,
+            fields, loadingFields, fetchFields, fieldPagination,
             slots, loadingSlots, fetchFieldSlots
         }}>
             {children}

@@ -371,10 +371,13 @@ def get_slots_by_date(field_id):
     results = []
     for s in all_slots:
         available = dao.is_field_available(field_id, booking_date, s.id)
+        duration = utils.calculate_duration(s.start_time, s.end_time)
         results.append({
             "id": s.id,
             "display": f"{s.start_time.strftime('%H:%M')} - {s.end_time.strftime('%H:%M')}",
-            "is_available": available
+            "is_available": available,
+            "price_multiplier": s.price_multiplier,
+            "duration": duration
         })
     return jsonify({
         "status": "success", 
