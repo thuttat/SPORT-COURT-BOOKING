@@ -10,20 +10,32 @@ import {Pagination} from "../../../components/common/Pagination.jsx";
 
 export function BookingHistory() {
     const [activeTab, setActiveTab] = useState("upcoming");
-
-    const { bookings, loading, pagination, fetchMyBookings } = useBooking();
+    const [currentPage, setCurrentPage] = useState(1);
+    const ITEMS_PER_PAGE = 5;
+    const { bookings, loading, fetchMyBookings } = useBooking();
 
     useEffect(() => {
-        fetchMyBookings(1);
+        fetchMyBookings();
     }, []);
 
-    const displayedBookings = bookings.filter(b => {
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [activeTab]);
+
+    const filteredBookings = bookings.filter(b => {
         if (activeTab === "upcoming") {
-            return b.status === "PENDING" || b.status === "DEPOSITED";
+            return b.status === "PENDING" || b.status === "DEPOSITED" || b.status === "CONFIRMED";
         } else {
             return b.status === "COMPLETED" || b.status === "CANCELLED";
         }
     });
+
+    const totalPages = Math.ceil(filteredBookings.length / ITEMS_PER_PAGE);
+
+    const displayedBookings = filteredBookings.slice(
+        (currentPage - 1) * ITEMS_PER_PAGE,
+        currentPage * ITEMS_PER_PAGE
+    );
 
     return (
         <div className="booking-history-container">
@@ -53,9 +65,9 @@ export function BookingHistory() {
                         </div>
 
                         <Pagination
-                            currentPage={pagination?.current_page}
-                            totalPages={pagination?.total_pages}
-                            onPageChange={fetchMyBookings}
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={(newPage) => setCurrentPage(newPage)}
                         />
                     </>
                 )}

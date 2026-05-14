@@ -103,10 +103,6 @@
     height: 100%;
 }
 
-.progress-bar.football { background: #b8d4f1; }
-.progress-bar.badminton { background: #b8e6d5; }
-.progress-bar.tennis { background: #d4b8e6; }
-
 .recent-list {
     display: flex;
     flex-direction: column;
@@ -130,10 +126,6 @@
     align-items: center;
     justify-content: center;
 }
-
-.recent-icon.football { background: #b8d4f1; }
-.recent-icon.badminton { background: #b8e6d5; }
-.recent-icon.tennis { background: #d4b8e6; }
 
 .recent-info {
     flex: 1;

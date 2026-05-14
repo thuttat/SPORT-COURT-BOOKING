@@ -57,18 +57,6 @@
     font-size: 30px;
 }
 
-.sport-icon.football {
-    background: var(--pastel-blue);
-}
-
-.sport-icon.badminton {
-    background: var(--available);
-}
-
-.sport-icon.tennis {
-    background: var(--pastel-purple);
-}
-
 .booking-info {
     display: flex;
     flex-direction: column;

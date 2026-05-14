@@ -159,3 +159,15 @@ body {
   padding: 40px;
   color: #64748b;
 }
+
+.football {
+  background: var(--pastel-blue);
+}
+
+.badminton {
+  background: var(--pastel-yellow);
+}
+
+.tennis {
+  background: var(--pastel-purple);
+}

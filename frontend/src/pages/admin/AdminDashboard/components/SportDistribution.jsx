@@ -23,7 +23,7 @@ export function SportDistribution({ fields }) {
                                     <span className="sport-icon">
                                         {sportIcons[sport]}
                                     </span>
-                                    <span className="capitalize">
+                                    <span>
                                         {capitalizeFirstLetter(sport)}
                                     </span>
                                 </div>

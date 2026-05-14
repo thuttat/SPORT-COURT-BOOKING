@@ -16,8 +16,10 @@ export const endpoints = {
     bookingDetails: (id) => `/my-bookings/${id}`,
     cancelBooking: (id) => `/bookings/${id}`,
     fields: "/fields",
+    fieldDetail: (id) => `/fields/${id}`,
     fieldSlots: (id) => `/fields/${id}/slots`,
     myFields: "/my-fields",
+    fieldAction: (id) => `/fields/${id}`,
 };
 
 export const loginRequest = (username, password) => {
@@ -75,6 +77,10 @@ export const getAllFieldsRequest = (page = 1, date) => {
     return api.get(endpoints.fields, { params: { page, date } });
 };
 
+export const getFieldDetailRequest = (id) => {
+    return api.get(endpoints.fieldDetail(id));
+}
+
 export const getFieldSlotsRequest = (fieldId, date) => {
     return api.get(endpoints.fieldSlots(fieldId), { params: { date } });
 };
@@ -82,6 +88,24 @@ export const getFieldSlotsRequest = (fieldId, date) => {
 export const getMyFieldsRequest = (page = 1) => {
     return api.get(endpoints.myFields, {
         params: {page, page_size: 100},
+        withCredentials: true
+    });
+};
+
+export const createFieldRequest = (formData) => {
+    return api.post(endpoints.fields, formData, {
+        withCredentials: true
+    });
+};
+
+export const updateFieldRequest = (id, formData) => {
+    return api.patch(endpoints.fieldAction(id), formData, {
+        withCredentials: true
+    });
+};
+
+export const deleteFieldRequest = (id) => {
+    return api.delete(endpoints.fieldAction(id), {
         withCredentials: true
     });
 };

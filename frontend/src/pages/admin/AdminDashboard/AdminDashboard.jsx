@@ -14,8 +14,18 @@ export function AdminDashboard() {
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
-                const fieldsResponse = await getMyFieldsRequest(1);
-                setFields(fieldsResponse.data.data);
+                let allFields = [];
+                let page = 1;
+                let hasNext = true;
+
+                while (hasNext) {
+                    const fieldsResponse = await getMyFieldsRequest(page);
+                    allFields = [...allFields, ...fieldsResponse.data.data];
+                    hasNext = fieldsResponse.data.pagination.has_next;
+                    page++;
+                }
+
+                setFields(allFields);
             } catch (error) {
                 console.error("Error fetching fields: ", error);
             } finally {

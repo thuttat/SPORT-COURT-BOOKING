@@ -15,7 +15,7 @@ export function CourtBooking() {
     const navigate = useNavigate();
     const { id } = useParams();
     const location = useLocation();
-    const {slots, loadingSlots, fetchFieldSlots} = useField();
+    const {slots, loadingSlots, fetchFieldSlots, fieldDetail, fetchFieldDetail} = useField();
     const [selectedDate, setSelectedDate] = useState(location.state?.preselectedDate || formatTodayString());
     const [selectedSlot, setSelectedSlot] = useState(null);
     const [isSubmitted, setIsSubmitted] = useState(false);
@@ -27,8 +27,9 @@ export function CourtBooking() {
         if (id && selectedDate) {
             fetchFieldSlots(id, selectedDate);
             setSelectedSlot(null);
+            fetchFieldDetail(id);
         }
-    }, [id, selectedDate, fetchFieldSlots]);
+    }, [id, selectedDate]);
 
     const handleConfirmBooking = async () => {
         if (!selectedSlot) return;
@@ -52,8 +53,8 @@ export function CourtBooking() {
         <div className="booking-container">
             <div className="booking-grid">
                     <BookingHeader
-                        name={`Court ${id}`}
                         onBack={() => navigate("/")}
+                        fieldDetail={fieldDetail}
                         isFull={isDayFull}
                     />
 
