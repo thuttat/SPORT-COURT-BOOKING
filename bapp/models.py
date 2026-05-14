@@ -23,7 +23,7 @@ class BookingStatus(enum.Enum):
     PENDING = 'PENDING'
     COMPLETED = 'COMPLETED'
     CANCELLED = 'CANCELLED'
-    DEPOSITED = 'DEPOSITED'
+    CONFIRMED = 'CONFIRMED'
 
 class PaymentMethod(enum.Enum):
     VNPAY = 'VNPAY'

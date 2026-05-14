@@ -18,6 +18,7 @@ app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
 app.config['SQLALCHEMY_ECHO'] = False
 app.config['PAGE_SIZE']=5 
+app.config['MAX_CANCELLATIONS_PER_WEEK'] = 3
 
 swagger = Swagger(app, template_file='swagger.yml')
 

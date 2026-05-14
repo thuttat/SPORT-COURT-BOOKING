@@ -272,8 +272,19 @@ def cancel_booking(booking_id):
         return jsonify({
             "status": "error",
             "message": "Cannot cancel a booking less than 2 hours before start time"}), 400
+    
+    #them cho tc
+    max_limit = app.config.get('MAX_CANCELLATIONS_PER_WEEK', 3) 
+    cancellation_count = dao.count_cancellations_by_user(current_user.id)
+    if cancellation_count >= max_limit:
+        return jsonify({
+            "status": "error",
+            "message": f"Account restricted from booking for 24 hours due to excessive cancellations."
+        }), 403
+
 
     dao.update_booking_status(booking_id, BookingStatus.CANCELLED)
+
     return jsonify({
         "status": "success",
         "message": "Booking canceled successfully"
@@ -379,6 +390,28 @@ def get_slots_by_date(field_id):
         "data": results
     }), 200
 
+
+@app.route('/api/fields/<int:field_id>', methods=['GET'])
+def get_field_detail(field_id):
+    field = dao.get_field_by_id(field_id)
+    if not field:
+        return jsonify({"status": "error", "message": "Field not found!"}), 404
+
+    if not field.is_active:
+        return jsonify({"status": "error", "message": "This field is no longer available"}), 404
+
+    return jsonify({
+        "status": "success",
+        "data": {
+            "id": field.id,
+            "name": field.name,
+            "field_type": field.field_type.name,
+            "price_per_hour": float(field.price_per_hour),
+            "description": field.description,
+            "image": field.image,
+            "is_active": field.is_active
+        }
+    }), 200
 
 
 @app.route('/api/fields', methods=['POST'])
