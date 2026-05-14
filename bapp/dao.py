@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from sqlalchemy import func
@@ -101,6 +103,15 @@ def update_booking_status(booking_id, new_status):
             db.session.rollback()
             raise
     return None
+
+def count_cancellations_by_user(user_id):
+    seven_days_ago = datetime.now() - timedelta(days=7)
+    count = Booking.query.filter(
+        Booking.user_id == user_id,
+        Booking.status == BookingStatus.CANCELLED,
+        Booking.booking_date >= seven_days_ago.date() 
+    ).count()
+    return count
 
 
 ##################################################
