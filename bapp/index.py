@@ -200,6 +200,15 @@ def get_my_booking_details(id):
 def create_booking():
     try:
         user_id = current_user.id
+
+        max_limit = app.config.get('MAX_CANCELLATIONS_PER_WEEK', 3) 
+        cancellation_count = dao.count_cancellations_by_user(user_id)
+        if cancellation_count >= max_limit:
+            return jsonify({
+                "status": "error",
+                "message": "Your account is temporarily restricted from booking for 24 hours due to excessive cancellations."
+            }), 403
+
         field_id = request.form.get('field_id')
         time_slots_id = request.form.get('time_slots_id')
         booking_date_str = request.form.get('booking_date')
@@ -230,6 +239,7 @@ def create_booking():
 
         if not dao.is_field_available(field_id, booking_date, time_slots_id):
             return jsonify({"status": "error", "message": "This court is already booked"}), 409
+        
 
         new_booking = dao.create_new_booking(user_id, field, time_slot, booking_date, duration)
         return jsonify({
@@ -279,7 +289,7 @@ def cancel_booking(booking_id):
     if cancellation_count >= max_limit:
         return jsonify({
             "status": "error",
-            "message": f"Account restricted from booking for 24 hours due to excessive cancellations."
+            "message": "Account restricted from booking for 24 hours due to excessive cancellations."
         }), 403
 
 
