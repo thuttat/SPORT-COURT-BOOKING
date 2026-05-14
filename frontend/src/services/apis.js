@@ -17,6 +17,7 @@ export const endpoints = {
     cancelBooking: (id) => `/bookings/${id}`,
     fields: "/fields",
     fieldSlots: (id) => `/fields/${id}/slots`,
+    myFields: "/my-fields",
 };
 
 export const loginRequest = (username, password) => {
@@ -76,6 +77,13 @@ export const getAllFieldsRequest = (page = 1, date) => {
 
 export const getFieldSlotsRequest = (fieldId, date) => {
     return api.get(endpoints.fieldSlots(fieldId), { params: { date } });
+};
+
+export const getMyFieldsRequest = (page = 1) => {
+    return api.get(endpoints.myFields, {
+        params: {page, page_size: 100},
+        withCredentials: true
+    });
 };
 
 export default api;
