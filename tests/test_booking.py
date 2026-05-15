@@ -131,7 +131,7 @@ def test_time_conflict_validation(test_client, mocker, auth_user, default_bookin
     assert "This court is already booked" in res.get_json()['message']
 
 # TC_BOOK_08: Thiếu fields 
-def test_book_missing_fields(test_client, auth_user):
+def test_book_missing_fields(test_client, auth_user,default_booking_mocks):
     res = test_client.post('/api/bookings', data={
         'field_id': '1', 
         'time_slots_id': '1'
@@ -140,7 +140,7 @@ def test_book_missing_fields(test_client, auth_user):
     assert "Missing required fields!" in res.get_json()['message']
 
 # TC_BOOK_09: Sai format ngày 
-def test_booking_date_format(test_client, auth_user):
+def test_booking_date_format(test_client, auth_user,default_booking_mocks):
     res = test_client.post('/api/bookings', data={
         'field_id': '1', 
         'time_slots_id': '1', 
