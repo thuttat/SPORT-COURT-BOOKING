@@ -1,3 +1,4 @@
+import os
 from urllib.parse import quote
 
 import cloudinary
@@ -12,13 +13,21 @@ import os
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
 app.secret_key = 'jfroooewq920jvjdftd$#%^7cnnmm'
+# <<<<<<< HEAD
+# app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
+#     "SQLALCHEMY_DATABASE_URI",
+#     'mysql+pymysql://root:%s@localhost/sportbookingdb' % quote('anhthu')
+# )
+# =======
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
-    "SQLALCHEMY_DATABASE_URI",
-    'mysql+pymysql://root:%s@localhost/sportbookingdb' % quote('anhthu')
-)
+    "DATABASE_URL",
+    'mysql+pymysql://root:%s@localhost/sportbookingdb' % quote('root')
+    )
+
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
 app.config['SQLALCHEMY_ECHO'] = False
 app.config['PAGE_SIZE']=5 
+app.config['MAX_CANCELLATIONS_PER_WEEK'] = 3
 
 swagger = Swagger(app, template_file='swagger.yml')
 

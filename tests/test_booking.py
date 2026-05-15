@@ -238,4 +238,6 @@ def test_book_different_court_types(test_client, mocker, auth_user, default_book
         assert res.status_code == 201
         assert data['data']['field_name'] == field.name
 
+#TC_BOOK_16: 
+
 

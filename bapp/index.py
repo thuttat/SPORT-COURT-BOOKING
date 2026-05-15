@@ -1,4 +1,3 @@
-import math
 from datetime import datetime, timedelta,  timezone
 import cloudinary
 import cloudinary.uploader
@@ -98,8 +97,8 @@ def register_user():
     try:
         res = cloudinary.uploader.upload(avatar)
         avatar_path = res['secure_url']
-        role = request.form.get('user_role', 'USER').upper()
-        role_enum = UserRole.ADMIN if role == 'ADMIN' else UserRole.USER
+        # role = request.form.get('user_role', 'USER').upper()
+        # role_enum = UserRole.ADMIN if role == 'ADMIN' else UserRole.USER
 
         dao.add_user(
             fullname=fullname,
@@ -107,7 +106,7 @@ def register_user():
             password=password,
             email=email,
             avatar=avatar_path,
-            user_role=role_enum
+            user_role=UserRole.USER
         )
         return jsonify({
             "status": "success",
@@ -133,16 +132,14 @@ def get_my_bookings():
     page = request.args.get('page', 1, type=int)
     page_size = app.config.get('PAGE_SIZE')
 
-    bookings = dao.get_bookings_paginated(
+    pagination = dao.get_bookings_paginated(
         user_id=current_user.id,
         page=page,
         page_size=page_size,
     )
-    total_bookings = dao.count_user_bookings(current_user.id)
-    total_pages = math.ceil(total_bookings / page_size)
 
     results = []
-    for b in bookings:
+    for b in pagination.items:  
         results.append({
             "id": b.id,
             "field_name": b.field.name,
@@ -158,12 +155,16 @@ def get_my_bookings():
         "status": "success",
         "data": results,
         "pagination": {
-            "total_items": total_bookings,
-            "total_pages": total_pages,
+            "total_items": pagination.total,   
+            "total_pages": pagination.pages,   
             "current_page": page,
-            "page_size": page_size
+            "page_size": page_size,
+            "has_next": pagination.has_next,
+            "has_prev": pagination.has_prev
         }
     }), 200
+
+
 
 @app.route('/api/my-bookings/<int:id>', methods=['GET'])
 @login_required
@@ -172,11 +173,10 @@ def get_my_booking_details(id):
     if not booking:
         return jsonify({"status": "error", "message": "Booking not found!"}), 404
 
-    if booking.user_id == current_user.id:
-        pass
-    elif current_user.user_role == UserRole.ADMIN and booking.field.user_id == current_user.id:
-        pass
-    else:
+    is_owner = booking.user_id == current_user.id
+    is_field_admin = current_user.user_role == UserRole.ADMIN and booking.field.user_id == current_user.id
+
+    if not (is_owner or is_field_admin):
         return jsonify({
             "status": "error",
             "message": "You are not authorized to view this booking detail"
@@ -201,10 +201,16 @@ def get_my_booking_details(id):
 @login_required
 def create_booking():
     try:
-        if not current_user.is_authenticated:
-            return jsonify({"status": "error", "message": "Please login to book a court"}), 401
-
         user_id = current_user.id
+
+        max_limit = app.config.get('MAX_CANCELLATIONS_PER_WEEK', 3) 
+        cancellation_count = dao.count_cancellations_by_user(user_id)
+        if cancellation_count >= max_limit:
+            return jsonify({
+                "status": "error",
+                "message": "Your account is temporarily restricted from booking for 24 hours due to excessive cancellations."
+            }), 403
+
         field_id = request.form.get('field_id')
         time_slots_id = request.form.get('time_slots_id')
         booking_date_str = request.form.get('booking_date')
@@ -235,6 +241,7 @@ def create_booking():
 
         if not dao.is_field_available(field_id, booking_date, time_slots_id):
             return jsonify({"status": "error", "message": "This court is already booked"}), 409
+        
 
         new_booking = dao.create_new_booking(user_id, field, time_slot, booking_date, duration)
         return jsonify({
@@ -277,8 +284,19 @@ def cancel_booking(booking_id):
         return jsonify({
             "status": "error",
             "message": "Cannot cancel a booking less than 2 hours before start time"}), 400
+    
+    #them cho tc
+    max_limit = app.config.get('MAX_CANCELLATIONS_PER_WEEK', 3) 
+    cancellation_count = dao.count_cancellations_by_user(current_user.id)
+    if cancellation_count >= max_limit:
+        return jsonify({
+            "status": "error",
+            "message": "Account restricted from booking for 24 hours due to excessive cancellations."
+        }), 403
 
-    cancel = dao.update_booking_status(booking_id, BookingStatus.CANCELLED)
+
+    dao.update_booking_status(booking_id, BookingStatus.CANCELLED)
+
     return jsonify({
         "status": "success",
         "message": "Booking canceled successfully"
@@ -289,45 +307,56 @@ def cancel_booking(booking_id):
 def get_all_active_fields_for_customer():
     page = request.args.get('page', 1, type=int)
     page_size = app.config.get('PAGE_SIZE', 10)
+    date_str = request.args.get('date')  
 
-    fields = dao.get_active_fields_paginated(page=page, page_size=page_size)
-    
+    pagination = dao.get_active_fields_paginated(page=page, page_size=page_size)
+
+    fully_booked_ids = []
+    if date_str:
+        booking_date = utils.parse_date(date_str)
+        if not booking_date:
+            return jsonify({"status": "error", "message": "Invalid date format (YYYY-MM-DD)!"}), 400
+        fully_booked_ids = dao.get_fully_booked_field_ids(booking_date)
+
     results = []
-    for f in fields:
+    for f in pagination.items:  
         results.append({
             "id": f.id,
             "name": f.name,
             "field_type": f.field_type.name,
             "price_per_hour": float(f.price_per_hour),
             "description": f.description,
-            "image": f.image
+            "image": f.image,
+            "is_available": (f.id not in fully_booked_ids) if date_str else None
         })
-        
+
     return jsonify({
         "status": "success",
         "data": results,
-        "page": page
+        "pagination": {
+            "total_items": pagination.total,
+            "total_pages": pagination.pages,
+            "current_page": page,
+            "has_next": pagination.has_next
+        }
     }), 200
-
 
 @app.route('/api/my-fields', methods=['GET'])
 @login_required
 def get_my_fields():
     if current_user.user_role != UserRole.ADMIN:
         return jsonify({
-            "status": "error",
+            "status": "error", 
             "message": "Access Denied. Admin privileges required."
         }), 403
 
     page = request.args.get('page', 1, type=int)
     page_size = app.config.get('PAGE_SIZE', 6)
 
-    total_count = dao.count_my_fields(current_user.id)
-    total_pages = math.ceil(total_count / page_size)
+    pagination = dao.get_fields_by_user_paginated(current_user.id, page=page, page_size=page_size)
 
-    field_list = dao.get_fields_by_user_paginated(current_user.id, page=page, page_size=page_size)
     results = []
-    for f in field_list:
+    for f in pagination.items:  
         results.append({
             "id": f.id,
             "name": f.name,
@@ -337,11 +366,16 @@ def get_my_fields():
             "image": f.image,
             "is_active": f.is_active
         })
+
     return jsonify({
         "status": "success",
         "data": results,
-        "total_count": dao.count_my_fields(current_user.id),
-        "page": page
+        "pagination": {
+            "total_items": pagination.total,  
+            "total_pages": pagination.pages,
+            "current_page": page,
+            "has_next": pagination.has_next
+        }
     }), 200
 
 
@@ -369,13 +403,33 @@ def get_slots_by_date(field_id):
     }), 200
 
 
+@app.route('/api/fields/<int:field_id>', methods=['GET'])
+def get_field_detail(field_id):
+    field = dao.get_field_by_id(field_id)
+    if not field:
+        return jsonify({"status": "error", "message": "Field not found!"}), 404
+
+    if not field.is_active:
+        return jsonify({"status": "error", "message": "This field is no longer available"}), 404
+
+    return jsonify({
+        "status": "success",
+        "data": {
+            "id": field.id,
+            "name": field.name,
+            "field_type": field.field_type.name,
+            "price_per_hour": float(field.price_per_hour),
+            "description": field.description,
+            "image": field.image,
+            "is_active": field.is_active
+        }
+    }), 200
+
+
 @app.route('/api/fields', methods=['POST'])
 @login_required
 @admin_only
 def add_new_field():
-    if not current_user.is_authenticated or current_user.user_role != UserRole.ADMIN:
-        return jsonify({"message": "Access Denied"}), 403
-
     name = request.form.get('name')
     price = request.form.get('price_per_hour')
     ftype_str = request.form.get('field_type')
@@ -420,7 +474,7 @@ def add_new_field():
 @login_required
 @admin_only
 def update_field(field_id):
-    field = Field.query.get(field_id)
+    field = db.session.get(Field, field_id)
     if not field:
         return jsonify({"message": "Field not found"}), 404
 
@@ -482,7 +536,7 @@ def update_field(field_id):
 @login_required
 @admin_only
 def delete_field(field_id):
-    field = Field.query.get(field_id)
+    field = db.session.get(Field, field_id)
     if not field:
         return jsonify({"message": "Field not found"}), 404
 
@@ -497,15 +551,13 @@ def delete_field(field_id):
 
     for b in upcoming_booking:
         start_datetime = datetime.combine(b.booking_date, b.time_slot.start_time)
-
         if start_datetime > now:
             return jsonify({
                 "status": "error",
                 "message": "Cannot delete this court because it has future bookings"
             }), 400
-
-    field.is_active = False
-    db.session.commit()
+        
+    dao.delete_field(field_id)
 
     return jsonify({
         "status": "success",

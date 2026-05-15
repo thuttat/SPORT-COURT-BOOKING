@@ -23,7 +23,7 @@ class BookingStatus(enum.Enum):
     PENDING = 'PENDING'
     COMPLETED = 'COMPLETED'
     CANCELLED = 'CANCELLED'
-    DEPOSITED = 'DEPOSITED'
+    CONFIRMED = 'CONFIRMED'
 
 class PaymentMethod(enum.Enum):
     VNPAY = 'VNPAY'
@@ -100,13 +100,13 @@ class Service(BaseModel):
     booking_details = relationship('BookingDetail', backref='service', lazy=True)
 
 
-class BookingDetail(db.Model):
+class BookingDetail(BaseModel):
     __tablename__ = 'booking_detail'
     quantity = Column(Integer, nullable=False, default=1)
     unit_price = Column(Float, nullable=False)
 
-    booking_id = Column(Integer, ForeignKey('booking.id'), primary_key=True)
-    service_id = Column(Integer, ForeignKey('service.id'), primary_key=True)
+    booking_id = Column(Integer, ForeignKey('booking.id'), nullable=False)
+    service_id = Column(Integer, ForeignKey('service.id'), nullable=False)
     booking = relationship('Booking', backref='details')
 
 if __name__ == '__main__':

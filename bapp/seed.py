@@ -1,6 +1,7 @@
 from bapp import app, db
 from bapp.models import User, Field, TimeSlots, UserRole, FieldType, Service
 import datetime
+from werkzeug.security import generate_password_hash, check_password_hash
 
 
 def create_dummy_data():
@@ -10,7 +11,7 @@ def create_dummy_data():
 
         user1 = User(
             username='duyadmin',
-            password='123456',
+            password=generate_password_hash('123456'),
             fullname='Nguyễn Triệu Duy',
             email='duy@gmail.com',
             user_role=UserRole.ADMIN,

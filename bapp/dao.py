@@ -1,41 +1,51 @@
-import hashlib
+from datetime import datetime, timedelta
+
+from werkzeug.security import generate_password_hash, check_password_hash
+
+from sqlalchemy import func
 
 from bapp import db, app
 from bapp.models import User, Field, TimeSlots, Booking, BookingStatus
 
 
 def get_user_by_id(id):
-    return User.query.get(id)
+    return db.session.get(User, id)
 
 
 def auth_user(username, password):
-    password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
-    return User.query.filter(User.username.__eq__(username.strip()),
-                             User.password.__eq__(password)).first()
+    user = User.query.filter(User.username == username.strip()).first()
+    if user and check_password_hash(user.password, password):
+        return user
+    return None
 
 def add_user(username, password,fullname,email,avatar,user_role):
-    password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
+    password = generate_password_hash(password)
     existing_user=User.query.filter(User.username.__eq__(username.strip())).first()
     existing_email = User.query.filter(User.email.__eq__(email.strip())).first()
     if existing_user:
-        raise Exception('Username already exists!')
+        raise ValueError('Username already exists!')
     if existing_email:
-        raise Exception('Email already exists!')
+        raise ValueError('Email already exists!')
     u = User(username=username,
              password=password,
              fullname=fullname,
              email=email,
              avatar=avatar,
              user_role=user_role)
-    db.session.add(u)
-    db.session.commit()
+    try:
+        db.session.add(u)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        raise
 
 ##################################################
 
-def get_field_and_slot(field_id,time_slots_id):
-    field=Field.query.get(field_id)
-    time_slot=TimeSlots.query.get(time_slots_id)
+def get_field_and_slot(field_id, time_slots_id):
+    field = db.session.get(Field, field_id)
+    time_slot = db.session.get(TimeSlots, time_slots_id)
     return field, time_slot
+    
 
 def is_field_available(field_id, booking_date,time_slots_id):
     existing_booking=Booking.query.filter(
@@ -64,10 +74,13 @@ def create_new_booking(user_id, field, time_slot, booking_date, duration):
         total_price=total_price,
         status=BookingStatus.PENDING
     )
-    db.session.add(new_booking)
-    db.session.commit()
-    return new_booking
-
+    try:
+        db.session.add(new_booking)
+        db.session.commit()
+        return new_booking
+    except Exception as e:
+        db.session.rollback()
+        raise 
 
 ##################################################
 
@@ -76,44 +89,51 @@ def get_booking_by_id(booking_id):
 
 
 def get_bookings_paginated(user_id, page=1, page_size=6):
-    offset = (int(page) - 1) * int(page_size)
-    query = Booking.query.filter(Booking.user_id == user_id).order_by(Booking.created_at.desc())
-    return query.offset(offset).limit(page_size).all()
+    return Booking.query.filter(Booking.user_id == user_id).order_by(Booking.created_at.desc()).paginate(page=int(page), per_page=int(page_size), error_out=False)
 
-def count_user_bookings(user_id):
-    return Booking.query.filter(Booking.user_id == user_id).count()
 
 def update_booking_status(booking_id, new_status):
-    booking=Booking.query.get(booking_id)
-
+    booking = db.session.get(Booking, booking_id)
     if booking:
         booking.status=new_status
-        db.session.commit()
-        return booking
+        try:
+            db.session.commit()
+            return booking
+        except Exception:
+            db.session.rollback()
+            raise
     return None
+
+def count_cancellations_by_user(user_id):
+    seven_days_ago = datetime.now() - timedelta(days=7)
+    count = Booking.query.filter(
+        Booking.user_id == user_id,
+        Booking.status == BookingStatus.CANCELLED,
+        Booking.booking_date >= seven_days_ago.date() 
+    ).count()
+    return count
 
 
 ##################################################
 
-def count_my_fields(user_id):
-    return Field.query.filter(
-        Field.user_id == user_id,
-        Field.is_active == True
-    ).count()
-
 def get_fields_by_user_paginated(user_id, page=1, page_size=6):
-    p = int(page) if page else 1
-    ps = int(page_size) if page_size else 6
-    offset = (p - 1) * ps
-    return Field.query.filter(Field.user_id == user_id,
-                              Field.is_active == True).offset(offset).limit(ps).all()
+    return Field.query.filter(Field.user_id == user_id, 
+           Field.is_active == True).paginate(page=int(page), per_page=int(page_size), error_out=False)
 
 
 def get_active_fields_paginated(page=1, page_size=10):
-    return Field.query.filter_by(is_active=True).paginate(page=page, per_page=page_size, error_out=False).items
+    return Field.query.filter_by(is_active=True).paginate(page=page, per_page=page_size, error_out=False)
 
 def get_field_by_id(field_id):
-    return Field.query.get(field_id)
+    return db.session.get(Field, field_id)
+
+def get_fully_booked_field_ids(booking_date):
+    total_slots = TimeSlots.query.count()
+    query = db.session.query(Booking.field_id).filter(
+        Booking.booking_date == booking_date,
+        Booking.status != BookingStatus.CANCELLED
+    ).group_by(Booking.field_id).having(func.count(Booking.id) >= total_slots).all()
+    return [row.field_id for row in query]
 
 def get_all_time_slots():
     return TimeSlots.query.order_by(TimeSlots.start_time).all()
@@ -135,12 +155,10 @@ def add_field(name, field_type, price_per_hour, description, image, user_id):
         return new_field
     except Exception as e:
         db.session.rollback()
-        print(f"Lỗi khi thêm sân: {str(e)}")
-        return None
-
+        raise
 
 def update_field(field_id, name=None, field_type=None, price_per_hour=None, description=None, image=None,is_active=None):
-    field = Field.query.get(field_id)
+    field = db.session.get(Field, field_id)
     if field:
         if name is not None:
             field.name = name
@@ -155,16 +173,24 @@ def update_field(field_id, name=None, field_type=None, price_per_hour=None, desc
         if is_active is not None:
             field.is_active = is_active
 
-        db.session.commit()
-        return field
+        try:
+            db.session.commit()
+            return field
+        except Exception:
+            db.session.rollback()
+            raise
     return None
 
 def delete_field(field_id):
-    field = Field.query.get(field_id)
+    field = db.session.get(Field, field_id)
     if field:
         field.is_active= False
-        db.session.commit()
-        return True
+        try:
+            db.session.commit()
+            return True
+        except Exception:
+            db.session.rollback()
+            raise
     return False
 
 ###########################################

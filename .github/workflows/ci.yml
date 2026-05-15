@@ -2,7 +2,7 @@ name: Flask Automated Testing
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "**" ]
   pull_request:
     branches: [ "main" ]
 
@@ -31,8 +31,12 @@ jobs:
     - name: Run tests with pytest
       env:
         PYTHONPATH: .
+<<<<<<< HEAD
         SQLALCHEMY_DATABASE_URI: "sqlite:///:memory:"
         TESTING: "true"
+=======
+        DATABASE_URL: "sqlite:///:memory:"
+>>>>>>> origin/duy
       run: |
         python -m pytest tests/ -v --ignore=tests/test_sel.py
 
