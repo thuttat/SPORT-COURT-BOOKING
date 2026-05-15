@@ -45,7 +45,7 @@ def default_booking_mocks(mocker):
     mocker.patch('bapp.index.dao.count_user_bookings_per_day', return_value=0)
     mocker.patch('bapp.index.dao.is_field_available', return_value=True)
     mocker.patch('bapp.index.dao.create_new_booking', return_value=FakeBooking())
-
+    mocker.patch('bapp.index.dao.count_cancellations_by_user', return_value=0)
 
 
 
@@ -131,7 +131,7 @@ def test_time_conflict_validation(test_client, mocker, auth_user, default_bookin
     assert "This court is already booked" in res.get_json()['message']
 
 # TC_BOOK_08: Thiếu fields 
-def test_book_missing_fields(test_client, auth_user):
+def test_book_missing_fields(test_client, auth_user, default_booking_mocks):
     res = test_client.post('/api/bookings', data={
         'field_id': '1', 
         'time_slots_id': '1'
@@ -140,7 +140,7 @@ def test_book_missing_fields(test_client, auth_user):
     assert "Missing required fields!" in res.get_json()['message']
 
 # TC_BOOK_09: Sai format ngày 
-def test_booking_date_format(test_client, auth_user):
+def test_booking_date_format(test_client, auth_user, default_booking_mocks):
     res = test_client.post('/api/bookings', data={
         'field_id': '1', 
         'time_slots_id': '1', 
@@ -239,5 +239,4 @@ def test_book_different_court_types(test_client, mocker, auth_user, default_book
         assert data['data']['field_name'] == field.name
 
 #TC_BOOK_16: 
-
 
