@@ -13,6 +13,7 @@ import os
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
 app.secret_key = 'jfroooewq920jvjdftd$#%^7cnnmm'
+
 # <<<<<<< HEAD
 # app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
 #     "SQLALCHEMY_DATABASE_URI",
@@ -24,6 +25,13 @@ app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
     'mysql+pymysql://root:%s@localhost/sportbookingdb' % quote('root')
     )
 
+# =======
+# # app.config["SQLALCHEMY_DATABASE_URI"] = 'mysql+pymysql://root:%s@localhost/sportbookingdb' % quote('admin123@')
+# app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
+#     "DATABASE_URL",
+#     'mysql+pymysql://root:%s@localhost/sport_booking_db' % quote('admin123@')
+#     )
+# >>>>>>> origin/btran-fe
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
 app.config['SQLALCHEMY_ECHO'] = False
 app.config['PAGE_SIZE']=5 

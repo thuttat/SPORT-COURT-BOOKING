@@ -1,0 +1,151 @@
+.field-management-container {
+    padding: 32px;
+}
+
+.field-management-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.field-management-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.field-form-card {
+    margin-bottom: 32px;
+    padding: 24px;
+}
+
+.field-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 12px;
+    font-size: 14px;
+}
+
+.sport-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.sport-option {
+    padding: 16px;
+    border-radius: 16px;
+    border: 2px solid var(--border);
+    background: white;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.sport-option:hover {
+    background: var(--muted);
+}
+
+.sport-option.selected {
+    border-color: var(--primary);
+}
+
+.sport-emoji {
+    font-size: 32px;
+    margin-bottom: 8px;
+}
+
+.sport-name {
+    text-transform: capitalize;
+    font-size: 14px;
+}
+
+.form-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+.fields-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.fields-table th {
+    text-align: left;
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+}
+
+.fields-table td {
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+}
+
+.fields-table tr:last-child td {
+    border-bottom: none;
+}
+
+.fields-table tr:hover {
+    background: var(--muted);
+}
+
+.field-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.field-name {
+    font-weight: 500;
+}
+
+.actions-header {
+    text-align: right;
+}
+
+.table-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.delete-icon {
+    color: var(--destructive)
+}
+
+.empty-state {
+    text-align: center;
+    padding: 64px 16px;
+    color: #64748b;
+}
+
+.flex-1 {
+    flex: 1;
+}
+
+.table-pagination {
+    padding: 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: transparent;
+}
+
+.table-pagination .pagination-container {
+    margin-top: 0;
+}
+
+.field-image {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 8px;
+}

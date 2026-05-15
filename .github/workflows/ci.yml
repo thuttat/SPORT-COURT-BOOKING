@@ -34,6 +34,7 @@ jobs:
         SQLALCHEMY_DATABASE_URI: "sqlite:///:memory:"
         TESTING: "true"
 #        DATABASE_URL: "sqlite:///:memory:"
+
       run: |
         python -m pytest tests/ -v --ignore=tests/test_sel.py
 

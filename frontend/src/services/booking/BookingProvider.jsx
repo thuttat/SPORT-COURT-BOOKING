@@ -4,17 +4,25 @@ import {cancelBookingRequest, getBookingDetailsRequest, getMyBookingsRequest} fr
 
 export function BookingProvider({ children }) {
     const [bookings, setBookings] = useState([]);
-    const [pagination, setPagination] = useState({});
     const [loading, setLoading] = useState(false);
     const [bookingDetails, setBookingDetails] = useState(null);
     const [detailLoading, setDetailLoading] = useState(true);
 
-    const fetchMyBookings = async (page = 1) => {
+    const fetchMyBookings = async () => {
         setLoading(true);
         try {
-            const response = await getMyBookingsRequest(page);
-            setBookings(response.data.data);
-            setPagination(response.data.pagination);
+            let allData = [];
+            let page = 1;
+            let hasNext = true;
+
+            while (hasNext) {
+                const response = await getMyBookingsRequest(page);
+                allData = [...allData, ...response.data.data];
+                hasNext = response.data.pagination.has_next;
+                page++;
+            }
+
+            setBookings(allData);
         } catch (error) {
             console.error("Error fetching booking history:", error);
             throw error;
@@ -47,7 +55,7 @@ export function BookingProvider({ children }) {
 
     return (
         <BookingContext.Provider value={{
-            bookings, pagination, loading, fetchMyBookings,
+            bookings, loading, fetchMyBookings,
             bookingDetails, detailLoading, fetchBookingDetails,
             cancelBooking
         }}>

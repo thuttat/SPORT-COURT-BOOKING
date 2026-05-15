@@ -10,6 +10,7 @@ export const sportIcons = {
 export const renderStatusBadge = (status) => {
     switch(status) {
         case 'PENDING': return <Badge variant="warning">Pending</Badge>;
+        case 'CONFIRMED': return <Badge variant="primary">Confirmed</Badge>;
         case 'COMPLETED': return <Badge variant="success">Completed</Badge>;
         case 'CANCELLED': return <Badge variant="danger">Cancelled</Badge>;
         case 'DEPOSITED': return <Badge variant="info">Deposited</Badge>;
