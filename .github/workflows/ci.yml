@@ -31,7 +31,7 @@ jobs:
     - name: Run tests with pytest
       env:
         PYTHONPATH: .
-        SQLALCHEMY_DATABASE_URI: "sqlite:///:memory:"
+        DATABASE_URL: "sqlite:///:memory:"
         TESTING: "true"
       run: |
         python -m pytest tests/ -v --ignore=tests/test_sel.py
@@ -39,7 +39,7 @@ jobs:
     - name: Run Selenium tests
       env:
         PYTHONPATH: .
-        SQLALCHEMY_DATABASE_URI: "sqlite:///:memory:"
+        DATABASE_URL: "sqlite:///:memory:"
         TESTING: "true"
       run: |
         python -m pytest tests/test_sel.py -v
