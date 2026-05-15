@@ -3,7 +3,6 @@ from datetime import datetime, timedelta
 from bapp.models import UserRole
 from tests.test_base import test_client, test_app, test_session
 
-# DÒNG QUAN TRỌNG NHẤT: Import index để Flask nạp toàn bộ @app.route trước khi test
 import bapp.index
 
 
@@ -45,6 +44,7 @@ def default_booking_mocks(mocker):
     mocker.patch('bapp.index.dao.count_user_bookings_per_day', return_value=0)
     mocker.patch('bapp.index.dao.is_field_available', return_value=True)
     mocker.patch('bapp.index.dao.create_new_booking', return_value=FakeBooking())
+    mocker.patch('bapp.index.dao.count_cancellations_by_user',return_value=0)
 
 
 
