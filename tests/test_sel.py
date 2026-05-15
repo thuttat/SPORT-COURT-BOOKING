@@ -6,7 +6,7 @@ from selenium.webdriver.support import expected_conditions as EC
 
 #TC search
 def test_search_courts(driver):
-    kw = 'Mini'
+    kw = 'VIP'
     home = HomePage(driver=driver)
     home.open_page()
     home.search(kw)
@@ -25,9 +25,9 @@ def test_booking_redirects_to_court_page(driver):
     home.open_page()
     home.booking()
 
-    expected_url = 'http://localhost:5173/court/c1'
-
-    WebDriverWait(driver, 10).until(EC.url_to_be(expected_url))
+    expected_url = 'http://localhost:5173/court/1'
+    driver.save_screenshot(f'url.png')
+    WebDriverWait(driver, 1)
 
     assert driver.current_url == expected_url, \
         f"URL sai: expected {expected_url}, got {driver.current_url}"
