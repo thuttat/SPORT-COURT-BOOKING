@@ -67,6 +67,12 @@ body {
   border-color: var(--primary);
 }
 
+.error {
+  color: var(--destructive);
+  text-align: center;
+  font-size: 14px;
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -148,3 +154,20 @@ body {
   margin-top: 20px;
 }
 
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: #64748b;
+}
+
+.football {
+  background: var(--pastel-blue);
+}
+
+.badminton {
+  background: var(--pastel-yellow);
+}
+
+.tennis {
+  background: var(--pastel-purple);
+}

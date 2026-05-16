@@ -1,25 +1,64 @@
 import { useState } from "react";
 import { BookingContext } from "./bookingContext";
+import {cancelBookingRequest, getBookingDetailsRequest, getMyBookingsRequest} from "../apis.js";
 
 export function BookingProvider({ children }) {
-    const [fields] = useState([
-        { id: "c1", sport: "football", available: true },
-        { id: "c2", sport: "badminton", available: true },
-        { id: "c3", sport: "tennis", available: true }
-    ]);
+    const [bookings, setBookings] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [bookingDetails, setBookingDetails] = useState(null);
+    const [detailLoading, setDetailLoading] = useState(true);
 
-    const [bookings] = useState([
-        {
-            id: "b1",
-            fieldName: "Sân A",
-            sport: "football",
-            date: "2026-04-19",
-            timeSlots: ["08:00"]
+    const fetchMyBookings = async () => {
+        setLoading(true);
+        try {
+            let allData = [];
+            let page = 1;
+            let hasNext = true;
+
+            while (hasNext) {
+                const response = await getMyBookingsRequest(page);
+                allData = [...allData, ...response.data.data];
+                hasNext = response.data.pagination.has_next;
+                page++;
+            }
+
+            setBookings(allData);
+        } catch (error) {
+            console.error("Error fetching booking history:", error);
+            throw error;
+        } finally {
+            setLoading(false);
         }
-    ]);
+    };
+
+    const fetchBookingDetails = async (id) => {
+        setDetailLoading(true);
+        try {
+            const response = await getBookingDetailsRequest(id);
+            setBookingDetails(response.data.data);
+        } catch (error) {
+            console.error("Error fetching booking details:", error);
+        } finally {
+            setDetailLoading(false);
+        }
+    }
+
+    const cancelBooking = async (id) => {
+        try {
+            const response = await cancelBookingRequest(id);
+            return response.data;
+        } catch (error) {
+            const errorMsg = error.response?.data?.message;
+            throw new Error(errorMsg);
+        }
+    }
 
     return (
-        <BookingContext.Provider value={{ fields, bookings }}>
+        <BookingContext.Provider value={{
+            bookings, loading, fetchMyBookings,
+            bookingDetails, detailLoading, fetchBookingDetails,
+            cancelBooking
+        }}>
             {children}
         </BookingContext.Provider>
     );

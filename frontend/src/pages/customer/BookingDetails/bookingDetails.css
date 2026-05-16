@@ -1,0 +1,92 @@
+.booking-details-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.back-button-custom {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: none;
+    padding-left: 0;
+}
+
+.details-card-content {
+    padding: 30px;
+}
+
+.details-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+}
+
+.details-title-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.details-sport-icon {
+    font-size: 2.5rem;
+    line-height: 1;
+}
+
+.details-field-name {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #1e293b;
+}
+
+.details-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.details-row {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #f1f5f9;
+    padding-bottom: 12px;
+}
+
+.details-row.align-center {
+    align-items: center;
+}
+
+.details-label {
+    color: #64748b;
+    font-weight: 500;
+}
+
+.details-value {
+    font-weight: 600;
+    color: #334155;
+}
+
+.details-value-muted {
+    color: #94a3b8;
+    font-size: 0.9rem;
+}
+
+.details-total-row {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 8px;
+}
+
+.details-total-label {
+    color: #475569;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.details-total-value {
+    font-weight: bold;
+    color: #ef4444;
+    font-size: 1.2rem;
+}

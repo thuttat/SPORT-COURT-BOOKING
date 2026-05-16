@@ -12,12 +12,14 @@ def auth_user(mocker):
         is_authenticated = True
         id = 1
         user_role = UserRole.USER
+
     mocker.patch('flask_login.utils._get_user', return_value=FakeUser())
     return FakeUser()
 
 
 @pytest.fixture
 def mock_bookings():
+
     class FakeField:
         id = 1; name = "Test"; price_per_hour = 100000
     class FakeSlot:
@@ -30,13 +32,15 @@ def mock_bookings():
         user_id = 1
         status = "CONFIRMED"
         booking_date = datetime.now() + timedelta(days=1)
+
         time_slot = FakeSlot()
-        
+
     class PastBooking:
         id = 2
         user_id = 1
         status = "COMPLETED"
         booking_date = datetime.now() - timedelta(days=1)
+
         time_slot = FakeSlot()
 
     now_in_vn = datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(hours=7)
@@ -93,7 +97,7 @@ def mock_bookings():
         class FakeSlot:
             start_time = datetime.strptime("10:00", "%H:%M").time()
         time_slot = FakeSlot()
-        
+
     return {
         "valid": ValidBookingToCancel(),
         "past": PastBooking(),
@@ -110,6 +114,7 @@ def mock_bookings():
 
 
 
+
 # TC_CAN_01: Hủy đơn đặt sân thành công (đúng 2h)
 def test_cancel_booking_success(test_client, mocker, auth_user, mock_bookings):
     mocker.patch('bapp.index.dao.get_booking_by_id', return_value=mock_bookings["valid"])
@@ -117,7 +122,7 @@ def test_cancel_booking_success(test_client, mocker, auth_user, mock_bookings):
     mocker.patch('bapp.index.dao.update_booking_status', return_value=True)
     res = test_client.delete('/api/bookings/1')
     data = res.get_json()
-    
+
     assert res.status_code == 200
     assert data['status'] == "success"
     assert data['message'] == "Booking canceled successfully"
@@ -141,7 +146,7 @@ def test_cancel_below_boundary_time(test_client,mocker,auth_user,mock_bookings):
     mocker.patch('bapp.index.dao.get_booking_by_id', return_value=mock_bookings["too_close"])
     res = test_client.delete('/api/bookings/3')
     data = res.get_json()
-    
+
     assert res.status_code == 400
     assert data['status'] == "error"
     assert "Cannot cancel a booking less than 2 hours before start time" in data['message']

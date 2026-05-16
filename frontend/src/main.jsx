@@ -4,13 +4,16 @@ import App from "./App";
 import "./styles/variables.css";
 import "./styles/index.css";
 import {BookingProvider} from "./services/booking/BookingProvider.jsx";
-import {AuthProvider} from "./services/auth/AuthContext.jsx";
+import {AuthProvider} from "./services/auth/AuthProvider.jsx";
+import {FieldProvider} from "./services/field/FieldProvider.jsx";
 
 ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
         <AuthProvider>
             <BookingProvider>
-                <App />
+                <FieldProvider>
+                    <App />
+                </FieldProvider>
             </BookingProvider>
         </AuthProvider>
     </React.StrictMode>

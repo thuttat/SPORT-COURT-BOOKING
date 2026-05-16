@@ -101,12 +101,7 @@
     display: flex;
     justify-content: space-between;
     font-size: 14px;
-}
-
-.selected-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
+    margin-bottom: 10px;
 }
 
 .btn-full {
@@ -118,4 +113,71 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
+}
+
+.slot.occupied,
+.slot:disabled {
+    background: #f1f5f9;
+    color: #94a3b8;
+    border: 1px dashed #cbd5e1;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.slot:disabled:hover {
+    transform: none;
+    background: #f1f5f9;
+}
+
+.header-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background: white;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+}
+
+.header-top-bar {
+    padding: 16px 20px 0 20px;
+}
+
+.field-cover-wrapper {
+    width: 100%;
+    height: 250px;
+    background-color: #f1f5f9;
+}
+
+.field-cover-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.field-detail-info {
+    padding: 0 24px 24px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.field-detail-info .title {
+    margin: 0;
+    font-size: 28px;
+    color: var(--foreground);
+}
+
+.field-desc {
+    color: #475569;
+    font-size: 15px;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.field-price-meta {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--primary);
+    margin-top: 8px;
 }

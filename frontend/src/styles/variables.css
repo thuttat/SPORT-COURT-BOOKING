@@ -6,6 +6,7 @@
     --secondary: #F1F5F9;
     --muted: #F1F5F9;
     --border: rgba(0, 0, 0, 0.08);
+    --muted-foreground: #6b7280;
 
     --pastel-blue: #b8d4f1;
     --pastel-yellow: #FDFD96;
@@ -14,6 +15,9 @@
     --available: #C8F0DD;
     --selected: #34D399;
     --booked: #E5E7EB;
+    --success: #10b981;
+    --destructive: #ef4444;
+    --warning: #d69b01;
 
     --bs-primary: #34D399;
     --bs-border-color: rgba(0, 0, 0, 0.08);
