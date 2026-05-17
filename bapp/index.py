@@ -11,14 +11,15 @@ from flask import request, jsonify, render_template, redirect
 from flask_login import login_user, login_required, logout_user, current_user
 
 from bapp import app, dao, login_manager, db, utils
-from bapp.decorators import admin_only
+from bapp.decorators import admin_only, user_only
 from bapp.models import User, UserRole, BookingStatus, Field, FieldType, Booking
 from bapp.utils import allowed_file
 
 from bapp.admin import admin_bp
+from bapp.payments import payment_bp
 
 app.register_blueprint(admin_bp)
- 
+app.register_blueprint(payment_bp)
 
 @app.route('/')
 def index():
@@ -229,6 +230,7 @@ def load_user(user_id):
 
 @app.route('/api/my-bookings', methods=['GET'])
 @login_required
+@user_only
 def get_my_bookings():
     page = request.args.get('page', 1, type=int)
     page_size = app.config.get('PAGE_SIZE')
@@ -269,15 +271,15 @@ def get_my_bookings():
 
 @app.route('/api/my-bookings/<int:id>', methods=['GET'])
 @login_required
+@user_only
 def get_my_booking_details(id):
     booking = dao.get_booking_by_id(id)
     if not booking:
         return jsonify({"status": "error", "message": "Booking not found!"}), 404
 
     is_owner = booking.user_id == current_user.id
-    is_field_admin = current_user.user_role == UserRole.ADMIN and booking.field.user_id == current_user.id
 
-    if not (is_owner or is_field_admin):
+    if not (is_owner):
         return jsonify({
             "status": "error",
             "message": "You are not authorized to view this booking detail"
@@ -300,6 +302,7 @@ def get_my_booking_details(id):
 
 @app.route('/api/bookings', methods=['POST'])
 @login_required
+@user_only
 def create_booking():
     try:
         user_id = current_user.id
@@ -362,6 +365,7 @@ def create_booking():
 
 @app.route('/api/bookings/<int:booking_id>', methods=['DELETE'])
 @login_required
+@user_only
 def cancel_booking(booking_id):
     booking_order = dao.get_booking_by_id(booking_id)
     if not booking_order:
