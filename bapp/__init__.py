@@ -17,7 +17,7 @@ app.secret_key = 'jfroooewq920jvjdftd$#%^7cnnmm'
 
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
     "DATABASE_URL",
-    'mysql+pymysql://root:%s@localhost/sportbookingdb' % quote('root')
+    'mysql+pymysql://root:%s@localhost/sport_booking_db' % quote('Baotran1805@')
     )
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True

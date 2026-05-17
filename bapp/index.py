@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta,  timezone
+from datetime import datetime, timedelta,  timezone, date
 import cloudinary
 import cloudinary.uploader
 import re
@@ -6,12 +6,19 @@ import datetime as dt_module
 from datetime import datetime as dt_class
 
 from flask import request, jsonify, render_template, redirect, session
+from werkzeug.security import generate_password_hash
+from flask import request, jsonify, render_template, redirect
 from flask_login import login_user, login_required, logout_user, current_user
 
 from bapp import app, dao, login_manager, db, utils
 from bapp.decorators import admin_only
-from bapp.models import UserRole, BookingStatus, Field, FieldType, Booking
+from bapp.models import User, UserRole, BookingStatus, Field, FieldType, Booking
 from bapp.utils import allowed_file
+
+from bapp.admin import admin_bp
+
+app.register_blueprint(admin_bp)
+ 
 
 @app.route('/')
 def index():
@@ -55,9 +62,101 @@ def login_my_user():
         return jsonify({
             "status": "success",
             "message": "Log in successfully!",
-            "data": {"id": user.id, "fullname": user.fullname, "username": user.username, "avatar": user.avatar, "role": user.user_role.name}
+            "data": {
+                "id": user.id,
+                "fullname": user.fullname,
+                "username": user.username,
+                "avatar": user.avatar,
+                "role": user.user_role.name
+            }
         }), 200
     return jsonify({"status": "error", "message": "Invalid username or password!"}), 400
+
+
+
+@app.route('/api/me', methods=['GET'])
+@login_required
+def get_current_user_info():
+    return jsonify({
+        "status": "success",
+        "data": {
+            "id": current_user.id,
+            "username": current_user.username,
+            "fullname": current_user.fullname,
+            "email": current_user.email,
+            "avatar": current_user.avatar,
+            "user_role": current_user.user_role.name
+        }
+    }), 200
+
+
+
+@app.route('/api/profile', methods=['PATCH'])
+@login_required
+def update_profile():
+    try:
+        user = current_user
+        new_fullname = request.form.get('fullname')
+        new_email = request.form.get('email')
+        new_password = request.form.get('password')
+        avatar_file = request.files.get('avatar')
+
+        if new_fullname:
+            user.fullname = new_fullname.strip()
+
+        if new_email and new_email != user.email:
+            import re
+            email_pattern = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
+            if not re.match(email_pattern, new_email):
+                return jsonify({"status": "error", "message": "Invalid email format!"}), 400
+                
+            existing_email = db.session.query(User).filter(User.email == new_email, User.id != user.id).first()
+            if existing_email:
+                return jsonify({
+                    "status": "error", 
+                    "message": "Email is already in use by another account"
+                }), 400
+            user.email = new_email.strip()
+
+        if new_password:
+            import re
+            password_pattern = r"^(?=.*[!@#$%^&*(),.?\":{}|<>]).{8,}$"
+            if not re.match(password_pattern, new_password):
+                return jsonify({
+                    "status": "error", 
+                    "message": "Invalid password format! Minimum 8 chars and 1 special char required."
+                }), 400
+            user.password = generate_password_hash(new_password)
+
+        if avatar_file:
+            from bapp.utils import allowed_file
+            if not allowed_file(avatar_file.filename):
+                return jsonify({
+                    "status": "error", 
+                    "message": "Invalid file type! Only images are allowed!"
+                }), 400
+            res = cloudinary.uploader.upload(avatar_file)
+            user.avatar = res['secure_url']
+
+        db.session.commit()
+
+        return jsonify({
+            "status": "success",
+            "message": "Profile updated successfully!",
+            "data": {
+                "id": user.id,
+                "username": user.username,
+                "fullname": user.fullname,
+                "email": user.email,
+                "avatar": user.avatar,
+                "user_role": user.user_role.name
+            }
+        }), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+
 
 @app.route('/api/logout', methods=['POST'])
 def logout_my_user():
@@ -93,7 +192,9 @@ def register_user():
         return jsonify({"status": "error", "message": "Invalid email format!"}), 400
 
     if avatar and not allowed_file(avatar.filename):
-        return jsonify({"status": "error", "message": "Invalid file type! Only images (PNG, JPG, JPEG) are allowed!"}), 400
+        return jsonify({
+            "status": "error", 
+            "message": "Invalid file type! Only images (PNG, JPG, JPEG) are allowed!"}), 400
 
     try:
         res = cloudinary.uploader.upload(avatar)
@@ -342,42 +443,7 @@ def get_all_active_fields_for_customer():
         }
     }), 200
 
-@app.route('/api/my-fields', methods=['GET'])
-@login_required
-def get_my_fields():
-    if current_user.user_role != UserRole.ADMIN:
-        return jsonify({
-            "status": "error", 
-            "message": "Access Denied. Admin privileges required."
-        }), 403
 
-    page = request.args.get('page', 1, type=int)
-    page_size = app.config.get('PAGE_SIZE', 6)
-
-    pagination = dao.get_fields_by_user_paginated(current_user.id, page=page, page_size=page_size)
-
-    results = []
-    for f in pagination.items:  
-        results.append({
-            "id": f.id,
-            "name": f.name,
-            "field_type": f.field_type.name,
-            "price_per_hour": float(f.price_per_hour),
-            "description": f.description,
-            "image": f.image,
-            "is_active": f.is_active
-        })
-
-    return jsonify({
-        "status": "success",
-        "data": results,
-        "pagination": {
-            "total_items": pagination.total,  
-            "total_pages": pagination.pages,
-            "current_page": page,
-            "has_next": pagination.has_next
-        }
-    }), 200
 
 
 
@@ -427,145 +493,6 @@ def get_field_detail(field_id):
             "image": field.image,
             "is_active": field.is_active
         }
-    }), 200
-
-
-@app.route('/api/fields', methods=['POST'])
-@login_required
-@admin_only
-def add_new_field():
-    name = request.form.get('name')
-    price = request.form.get('price_per_hour')
-    ftype_str = request.form.get('field_type')
-    description = request.form.get('description')
-
-    if Field.query.filter_by(name=name).first():
-        return jsonify({"status": "error", "message": "Court name already exists"}), 400
-
-    image_url = "https://res.cloudinary.com/dyupzyqwj/image/upload/v1774885674/siqqkjjrpotnvfjtoij7.jpg"
-    file = request.files.get('image')
-    if file:
-        res = cloudinary.uploader.upload(file)
-        image_url = res['secure_url']
-    try:
-        field_type_enum = FieldType[ftype_str.upper()]
-        new_f = dao.add_field(
-            name=name,
-            field_type=field_type_enum,
-            price_per_hour=float(price),
-            description=description,
-            image=image_url,
-            user_id=current_user.id
-        )
-        return jsonify({
-            "status": "success",
-            "message": "System saves the new court successfully",
-            "data": {
-                "id": new_f.id,
-                "name": new_f.name,
-                "field_type": new_f.field_type.name,
-                "price_per_hour": new_f.price_per_hour,
-                "description": new_f.description,
-                "image": new_f.image,
-                "created_at": new_f.created_at.strftime("%Y-%m-%d %H:%M:%S")
-            }
-        }), 201
-    except Exception as e:
-        return jsonify({"status": "error", "message": str(e)}), 500
-
-
-@app.route('/api/fields/<int:field_id>', methods=['PATCH'])
-@login_required
-@admin_only
-def update_field(field_id):
-    field = db.session.get(Field, field_id)
-    if not field:
-        return jsonify({"message": "Field not found"}), 404
-
-    if field.user_id != current_user.id:
-        return jsonify({"status": "error", "message": "Access Denied"}), 403
-
-    data_to_update = {}
-    new_name = request.form.get('name')
-
-    if new_name:
-        if Field.query.filter(Field.name == new_name, Field.id != field_id).first():
-            return jsonify({"message": "Court name already exists"}), 400
-        data_to_update['name'] = new_name
-
-    file = request.files.get('image')
-    if file:
-        res = cloudinary.uploader.upload(file)
-        data_to_update['image'] = res['secure_url']
-
-    price = request.form.get('price_per_hour')
-    if price:
-        data_to_update['price_per_hour'] = float(price)
-
-    description = request.form.get('description')
-    if description:
-        data_to_update['description'] = description.strip()
-
-    field_type = request.form.get('field_type')
-    if field_type:
-        try:
-            data_to_update['field_type'] = FieldType[field_type.upper()]
-        except KeyError:
-            return jsonify({"message": "Invalid field type"}), 400
-
-    if data_to_update:
-        updated_field = dao.update_field(field_id, **data_to_update)
-
-        if updated_field:
-            return jsonify({
-                "status": "success",
-                "message": "Court updated successfully",
-                "data": {
-                    "id": updated_field.id,
-                    "name": updated_field.name,
-                    "field_type": updated_field.field_type.name,
-                    "price_per_hour": float(updated_field.price_per_hour),
-                    "description": updated_field.description,
-                    "image": updated_field.image,
-                    "is_active": updated_field.is_active
-                }
-            }), 200
-    else:
-        return jsonify({"status": "error", "message": "No data provided to update"}), 400
-
-    return jsonify({"status": "error", "message": "Something went wrong during update"}), 500
-
-
-@app.route('/api/fields/<int:field_id>', methods=['DELETE'])
-@login_required
-@admin_only
-def delete_field(field_id):
-    field = db.session.get(Field, field_id)
-    if not field:
-        return jsonify({"message": "Field not found"}), 404
-
-    if field.user_id != current_user.id:
-        return jsonify({"message": "Access Denied"}), 403
-
-    now = datetime.now()
-    upcoming_booking = Booking.query.filter(
-        Booking.field_id == field_id,
-        Booking.status == BookingStatus.PENDING
-    ).all()
-
-    for b in upcoming_booking:
-        start_datetime = datetime.combine(b.booking_date, b.time_slot.start_time)
-        if start_datetime > now:
-            return jsonify({
-                "status": "error",
-                "message": "Cannot delete this court because it has future bookings"
-            }), 400
-        
-    dao.delete_field(field_id)
-
-    return jsonify({
-        "status": "success",
-        "message": "Field deleted (inactivated) successfully"
     }), 200
 
 ################################################################

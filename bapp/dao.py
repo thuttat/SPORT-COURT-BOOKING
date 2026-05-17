@@ -35,6 +35,7 @@ def add_user(username, password,fullname,email,avatar,user_role):
     try:
         db.session.add(u)
         db.session.commit()
+        return u
     except Exception as e:
         db.session.rollback()
         raise
@@ -109,17 +110,18 @@ def count_cancellations_by_user(user_id):
     count = Booking.query.filter(
         Booking.user_id == user_id,
         Booking.status == BookingStatus.CANCELLED,
-        Booking.booking_date >= seven_days_ago.date() 
+        Booking.created_at >= seven_days_ago
     ).count()
     return count
 
 
 ##################################################
 
-def get_fields_by_user_paginated(user_id, page=1, page_size=6):
-    return Field.query.filter(Field.user_id == user_id, 
-           Field.is_active == True).paginate(page=int(page), per_page=int(page_size), error_out=False)
-
+def get_fields_by_user_paginated(user_id, page=1, page_size=6, include_inactive=False):
+    query = Field.query.filter(Field.user_id == user_id)
+    if not include_inactive:
+        query = query.filter(Field.is_active == True)
+    return query.paginate(page=int(page), per_page=int(page_size), error_out=False)
 
 def get_active_fields_paginated(page=1, page_size=10):
     return Field.query.filter_by(is_active=True).paginate(page=page, per_page=page_size, error_out=False)
