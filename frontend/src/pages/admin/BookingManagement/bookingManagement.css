@@ -1,0 +1,126 @@
+.booking-management-container {
+    padding: 32px;
+}
+
+.booking-management-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.management-tabs {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 16px;
+    overflow-x: auto;
+}
+
+.customer-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.customer-name {
+    font-weight: 600;
+    color: var(--foreground);
+}
+
+.booking-id {
+    font-size: 12px;
+    color: #64748b;
+}
+
+.field-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.schedule-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 14px;
+}
+
+.btn-icon {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(15, 23, 42, 0.6); /* Nền mờ tối */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+}
+
+.modal-content {
+    background: white;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 500px;
+    padding: 24px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    animation: modalFadeIn 0.3s ease-out;
+}
+
+@keyframes modalFadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 20px;
+    color: var(--foreground);
+}
+
+.modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px dashed var(--border);
+}
+
+.detail-row:last-child {
+    border-bottom: none;
+}
+
+.detail-label {
+    color: #64748b;
+    font-size: 14px;
+}
+
+.detail-value {
+    font-weight: 600;
+    color: var(--foreground);
+    text-align: right;
+}

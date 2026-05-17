@@ -6,9 +6,15 @@ import { useField } from "../../../services/field/useField.js";
 import { FieldForm } from "./components/FieldForm.jsx";
 import { FieldTable } from "./components/FieldTable.jsx";
 import "./courtManagement.css";
+import {capitalizeFirstLetter} from "../../../utils/formatters.js";
+
+const SPORTS_TABS = ["all", "football", "badminton", "tennis"];
 
 export function CourtManagement() {
-    const { myFields, myFieldPagination, loadingMyFields, fetchMyFields, addField, editField, removeField } = useField();
+    const { myFields, loadingMyFields, fetchMyFields, addField, editField, removeField } = useField();
+    const [activeSport, setActiveSport] = useState("all");
+    const [currentPage, setCurrentPage] = useState(1);
+    const ITEMS_PER_PAGE = 5;
     const [showForm, setShowForm] = useState(false);
     const [editingId, setEditingId] = useState(null);
     const [isSubmitted, setIsSubmitted] = useState(false);
@@ -22,17 +28,26 @@ export function CourtManagement() {
     });
 
     useEffect(() => {
-        fetchMyFields(1);
+        fetchMyFields();
     }, []);
 
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [activeSport]);
+
+    const filteredFields = myFields.filter(field => {
+        const sport = field.field_type.toLowerCase();
+        return activeSport === "all" || sport === activeSport;
+    });
+
+    const totalPages = Math.ceil(filteredFields.length / ITEMS_PER_PAGE);
+    const displayedFields = filteredFields.slice(
+        (currentPage - 1) * ITEMS_PER_PAGE,
+        currentPage * ITEMS_PER_PAGE
+    );
+
     const resetForm = () => {
-        setFormData({
-            name: "",
-            field_type: "football",
-            price_per_hour: "",
-            description: "",
-            image: null,
-        });
+        setFormData({ name: "", field_type: "football", price_per_hour: "", description: "", image: null });
         setEditingId(null);
         setShowForm(false);
     };
@@ -59,7 +74,7 @@ export function CourtManagement() {
                 await addField(payload);
                 alert("Create successfully!");
             }
-            fetchMyFields(myFieldPagination?.current_page || 1);
+            fetchMyFields();
             resetForm();
         } catch (error) {
             alert(`Error: ${error.response?.data?.message}`);
@@ -81,12 +96,11 @@ export function CourtManagement() {
     };
 
     const handleDeleteClick = async (id) => {
-        const isConfirmed = window.confirm("Are you sure you want to delete (deactivate) this court? This action cannot be reversed if someone is currently booking the court.");
-        if (isConfirmed) {
+        if (window.confirm("Are you sure you want to delete (deactivate) this court?")) {
             try {
                 await removeField(id);
                 alert("Delete (deactivate) successfully!");
-                fetchMyFields(myFieldPagination?.current_page || 1);
+                fetchMyFields();
             } catch (error) {
                 alert(`Error: ${error.response?.data?.message}`);
             }
@@ -103,6 +117,17 @@ export function CourtManagement() {
                     </Button>
                 </div>
 
+                <div className="management-tabs">
+                    {SPORTS_TABS.map(sport => (
+                        <Button
+                            className={`tab-btn ${activeSport === sport ? "active" : ""}`}
+                            onClick={() => setActiveSport(sport)}
+                        >
+                            {sport === "all" ? "All Sports" : capitalizeFirstLetter(sport)}
+                        </Button>
+                    ))}
+                </div>
+
                 {showForm && (
                     <FieldForm
                         formData={formData}
@@ -116,9 +141,10 @@ export function CourtManagement() {
 
                 <FieldTable
                     loading={loadingMyFields}
-                    fields={myFields}
-                    pagination={myFieldPagination}
-                    onPageChange={fetchMyFields}
+                    fields={displayedFields}
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={(page) => setCurrentPage(page)}
                     onEditClick={handleEditClick}
                     onDeleteClick={handleDeleteClick}
                 />

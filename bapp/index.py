@@ -5,7 +5,7 @@ import re
 import datetime as dt_module
 from datetime import datetime as dt_class
 
-from flask import request, jsonify, render_template, redirect
+from flask import request, jsonify, render_template, redirect, session
 from flask_login import login_user, login_required, logout_user, current_user
 
 from bapp import app, dao, login_manager, db, utils
@@ -51,6 +51,7 @@ def login_my_user():
     user = dao.auth_user(username=username, password=password)
     if user:
         login_user(user)
+        session.permanent = True
         return jsonify({
             "status": "success",
             "message": "Log in successfully!",
@@ -570,5 +571,6 @@ def delete_field(field_id):
 ################################################################
 
 if __name__ == '__main__':
+    from bapp import admin
     with app.app_context():
         app.run(debug=True)

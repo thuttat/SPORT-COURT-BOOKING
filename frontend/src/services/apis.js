@@ -7,6 +7,21 @@ const api = axios.create({
     withCredentials: true
 });
 
+api.interceptors.response.use(
+    (response) => {
+        return response;
+    },
+    (error) => {
+        if (error.response && error.response.status === 401) {
+            localStorage.removeItem("accessToken");
+            localStorage.removeItem("role");
+            alert("Your login session has expired. Please log in again!");
+            window.location.href = '/login';
+        }
+        return Promise.reject(error);
+    }
+);
+
 export const endpoints = {
     login: "/login",
     register: "/register",
