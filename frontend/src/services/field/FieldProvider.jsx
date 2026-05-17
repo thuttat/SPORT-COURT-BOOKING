@@ -4,7 +4,7 @@ import {
     getAllFieldsRequest,
     getFieldDetailRequest,
     getFieldSlotsRequest,
-    getMyFieldsRequest, updateFieldRequest
+    getAdminFieldsRequest, updateFieldRequest
 } from "../apis.js";
 import {FieldContext} from "./fieldContext.js";
 
@@ -13,19 +13,24 @@ export function FieldProvider({ children }) {
     const [loadingFields, setLoadingFields] = useState(false);
     const [slots, setSlots] = useState([]);
     const [loadingSlots, setLoadingSlots] = useState(false);
-    const [fieldPagination, setFieldPagination] = useState({});
     const [fieldDetail, setFieldDetail] = useState(null);
     const [loadingDetail, setLoadingDetail] = useState(false);
     const [myFields, setMyFields] = useState([]);
-    const [myFieldPagination, setMyFieldPagination] = useState({});
     const [loadingMyFields, setLoadingMyFields] = useState(false);
 
-    const fetchFields = async (page = 1, date) => {
+    const fetchFields = async (date) => {
         setLoadingFields(true);
         try {
-            const response = await getAllFieldsRequest(page, date);
-            setFields(response.data.data);
-            setFieldPagination(response.data.pagination);
+            let allData = [];
+            let page = 1;
+            let hasNext = true;
+            while (hasNext) {
+                const response = await getAllFieldsRequest(page, date);
+                allData = [...allData, ...response.data.data];
+                hasNext = response.data.pagination.has_next;
+                page++;
+            }
+            setFields(allData);
         } catch (error) {
             console.error("Error fetching fields", error);
         } finally {
@@ -57,12 +62,19 @@ export function FieldProvider({ children }) {
         }
     }, []);
 
-    const fetchMyFields = async (page = 1) => {
+    const fetchMyFields = async () => {
         setLoadingMyFields(true);
         try {
-            const response = await getMyFieldsRequest(page);
-            setMyFields(response.data.data);
-            setMyFieldPagination(response.data.pagination);
+            let allData = [];
+            let page = 1;
+            let hasNext = true;
+            while (hasNext) {
+                const response = await getAdminFieldsRequest(page);
+                allData = [...allData, ...response.data.data];
+                hasNext = response.data.pagination.has_next;
+                page++;
+            }
+            setMyFields(allData);
         } catch (error) {
             console.error("Error fetching fields:", error);
         } finally {
@@ -87,10 +99,10 @@ export function FieldProvider({ children }) {
 
     return (
         <FieldContext.Provider value={{
-            fields, loadingFields, fetchFields, fieldPagination,
+            fields, loadingFields, fetchFields,
             fieldDetail, loadingDetail, fetchFieldDetail,
             slots, loadingSlots, fetchFieldSlots,
-            myFields, myFieldPagination, loadingMyFields, fetchMyFields,
+            myFields, loadingMyFields, fetchMyFields,
             addField, editField, removeField
         }}>
             {children}

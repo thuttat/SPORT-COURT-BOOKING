@@ -22,8 +22,8 @@ function App() {
                 <Route path="/register" element={<Register />} />
                 <Route element={<CustomerLayout />}>
                     <Route path="/" element={<Home />} />
-                    <Route path="/court/:id" element={<CourtBooking />} />
                     <Route element={<ProtectedRoute allowedRoles={["USER"]} />}>
+                        <Route path="/court/:id" element={<CourtBooking />} />
                         <Route path="/bookings" element={<BookingHistory />} />
                         <Route path="/booking/:id" element={<BookingDetails />} />
                         <Route path="/profile" element={<Profile />} />

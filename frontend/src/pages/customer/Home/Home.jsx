@@ -5,34 +5,38 @@ import {PageHeader} from "../../../components/common/PageHeader.jsx";
 import "./home.css";
 import {EmptyState} from "../../../components/common/EmptyState.jsx";
 import {formatTodayString} from "../../../utils/formatters.js";
-import {useField} from "../../../services/field/useField.js";
 import {Pagination} from "../../../components/common/Pagination.jsx";
+import {useField} from "../../../services/field/useField.js";
 
 export function Home() {
-    const {fields, loadingFields, fetchFields, fieldPagination} = useField();
+    const { fields, loadingFields, fetchFields } = useField();
     const [search, setSearch] = useState("");
     const [selectedSport, setSelectedSport] = useState("all");
     const [selectedDate, setSelectedDate] = useState(formatTodayString());
-
-    const handlePageChange = (newPage) => {
-        fetchFields(newPage, selectedDate);
-    }
+    const [currentPage, setCurrentPage] = useState(1);
+    const ITEMS_PER_PAGE = 5;
 
     useEffect(() => {
-        fetchFields(1, selectedDate);
+        fetchFields(selectedDate);
+        setCurrentPage(1);
     }, [selectedDate]);
 
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [search, selectedSport]);
+
     const filteredFields = fields.filter(court => {
-        const matchSearch = court.name
-            .toLowerCase()
-            .includes(search.toLowerCase());
-
+        const matchSearch = court.name.toLowerCase().includes(search.toLowerCase());
         const sport = court.field_type ? court.field_type.toLowerCase() : "";
-        const matchSport =
-            selectedSport === "all" || sport === selectedSport;
-
+        const matchSport = selectedSport === "all" || sport === selectedSport;
         return matchSearch && matchSport;
     });
+
+    const totalPages = Math.ceil(filteredFields.length / ITEMS_PER_PAGE);
+    const displayedFields = filteredFields.slice(
+        (currentPage - 1) * ITEMS_PER_PAGE,
+        currentPage * ITEMS_PER_PAGE
+    );
 
     return (
         <div className="container">
@@ -52,17 +56,17 @@ export function Home() {
             ) : (
                 <>
                     <div className="grid">
-                        {filteredFields.map(court => (
+                        {displayedFields.map(court => (
                             <CourtCard key={court.id} court={court} selectedDate={selectedDate} />
                         ))}
                     </div>
 
-                    {filteredFields.length === 0 && <EmptyState text="courts" /> }
+                    {displayedFields.length === 0 && <EmptyState text="courts" /> }
 
                     <Pagination
-                        currentPage={fieldPagination?.current_page}
-                        totalPages={fieldPagination?.total_pages}
-                        onPageChange={handlePageChange}
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={(page) => setCurrentPage(page)}
                     />
                 </>
             )}

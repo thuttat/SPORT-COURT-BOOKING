@@ -68,54 +68,6 @@
     gap: 12px;
 }
 
-.table-wrapper {
-    overflow-x: auto;
-}
-
-.fields-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.fields-table th {
-    text-align: left;
-    padding: 16px;
-    border-bottom: 1px solid var(--border);
-}
-
-.fields-table td {
-    padding: 16px;
-    border-bottom: 1px solid var(--border);
-}
-
-.fields-table tr:last-child td {
-    border-bottom: none;
-}
-
-.fields-table tr:hover {
-    background: var(--muted);
-}
-
-.field-info {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.field-name {
-    font-weight: 500;
-}
-
-.actions-header {
-    text-align: right;
-}
-
-.table-actions {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
 .delete-icon {
     color: var(--destructive)
 }

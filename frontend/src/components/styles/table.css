@@ -1,0 +1,37 @@
+.table-wrapper {
+    overflow-x: auto;
+    width: 100%;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table-head {
+    text-align: left;
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+    color: #64748b;
+    font-weight: 600;
+}
+
+.table-cell {
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+}
+
+.table-body .table-row:last-child .table-cell {
+    border-bottom: none;
+}
+
+.table-body .table-row:hover {
+    background: var(--muted);
+}
+
+.table-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}

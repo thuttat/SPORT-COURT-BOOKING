@@ -6,91 +6,91 @@ import { EmptyState } from "../../../../components/common/EmptyState.jsx";
 import { Pagination } from "../../../../components/common/Pagination.jsx";
 import { Edit2, Trash2 } from "lucide-react";
 import { capitalizeFirstLetter, formatCurrency } from "../../../../utils/formatters.js";
-import {sportIcons} from "../../../../utils/constants.jsx";
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../../../../components/common/Table.jsx";
 
-export function FieldTable({ loading, fields, pagination, onPageChange, onEditClick, onDeleteClick}) {
+export function FieldTable({ loading, fields, currentPage, totalPages, onPageChange, onEditClick, onDeleteClick}) {
     return (
         <Card>
             {loading ? (
                 <div className="loading">Loading...</div>
             ) : (
                 <>
-                    <div className="table-wrapper">
-                        <table className="fields-table">
-                            <thead>
-                            <tr>
-                                <th>Field Info</th>
-                                <th>Sport</th>
-                                <th>Price/Hour</th>
-                                <th>Status</th>
-                                <th className="actions-header">Actions</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {fields.map((field) => {
-                                const sport = field.field_type.toLowerCase();
-                                return (
-                                    <tr key={field.id}>
-                                        <td>
-                                            <div className="field-info">
-                                                {field.image ? (
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Field Info</TableHead>
+                                <TableHead>Sport</TableHead>
+                                <TableHead>Price/Hour</TableHead>
+                                <TableHead>Status</TableHead>
+                                <TableHead>Actions</TableHead>
+                            </TableRow>
+                        </TableHeader>
+
+                        <TableBody>
+                            {fields.length === 0 ? (
+                                <TableRow>
+                                    <TableCell colSpan={5} style={{ padding: 0 }}>
+                                        <EmptyState text="fields" />
+                                    </TableCell>
+                                </TableRow>
+                            ) : (
+                                fields.map((field) => {
+                                    const sport = field.field_type.toLowerCase();
+                                    return (
+                                        <TableRow key={field.id}>
+                                            <TableCell>
+                                                <div className="field-info">
                                                     <img
                                                         src={field.image}
                                                         alt="thumbnail"
-                                                        className="field-image"
+                                                        style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '8px' }}
                                                     />
-                                                ) : (
-                                                    <div className={`field-image ${sport}`} style={{ fontSize: "30px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                                                        {sportIcons[sport]}
+                                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                                        <span className="field-name">{field.name}</span>
+                                                        <span style={{ fontSize: '12px', color: '#64748b' }}>ID: {field.id}</span>
                                                     </div>
-                                                )}
-
-                                                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                                    <span className="field-name">{field.name}</span>
-                                                    <span style={{ fontSize: '12px', color: '#64748b' }}>ID: {field.id}</span>
                                                 </div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <span>{capitalizeFirstLetter(sport)}</span>
-                                        </td>
-                                        <td>
-                                            {formatCurrency(field.price_per_hour)}
-                                        </td>
-                                        <td>
-                                            {field.is_active ? (
-                                                <Badge variant="success">Active</Badge>
-                                            ) : (
-                                                <Badge variant="danger">Inactive</Badge>
-                                            )}
-                                        </td>
-                                        <td>
-                                            <div className="table-actions">
-                                                <Button size="sm" className="btn-outline" onClick={() => onEditClick(field)}>
-                                                    <Edit2 size={16} />
-                                                </Button>
-                                                {field.is_active && (
-                                                    <Button size="sm" className="btn-outline" onClick={() => onDeleteClick(field.id)}>
-                                                        <Trash2 size={16} className="delete-icon" />
-                                                    </Button>
-                                                )}
-                                            </div>
-                                        </td>
-                                    </tr>
-                                );
-                            })}
-                            </tbody>
-                        </table>
+                                            </TableCell>
 
-                        {fields.length === 0 && (
-                            <EmptyState text="fields" />
-                        )}
-                    </div>
+                                            <TableCell>
+                                                <span>{capitalizeFirstLetter(sport)}</span>
+                                            </TableCell>
+
+                                            <TableCell>
+                                                {formatCurrency(field.price_per_hour)}
+                                            </TableCell>
+
+                                            <TableCell>
+                                                {field.is_active ? (
+                                                    <Badge variant="success">Active</Badge>
+                                                ) : (
+                                                    <Badge variant="danger">Inactive</Badge>
+                                                )}
+                                            </TableCell>
+
+                                            <TableCell>
+                                                <div className="table-actions">
+                                                    <Button size="sm" className="btn-outline" onClick={() => onEditClick(field)}>
+                                                        <Edit2 size={16} />
+                                                    </Button>
+                                                    {field.is_active && (
+                                                        <Button size="sm" className="btn-outline" onClick={() => onDeleteClick(field.id)}>
+                                                            <Trash2 size={16} className="delete-icon" />
+                                                        </Button>
+                                                    )}
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    );
+                                })
+                            )}
+                        </TableBody>
+                    </Table>
 
                     <div className="table-pagination">
                         <Pagination
-                            currentPage={pagination?.current_page}
-                            totalPages={pagination?.total_pages}
+                            currentPage={currentPage}
+                            totalPages={totalPages}
                             onPageChange={onPageChange}
                         />
                     </div>

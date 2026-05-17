@@ -4,47 +4,44 @@ import { EmptyState } from "../../../../components/common/EmptyState.jsx";
 import { sportIcons } from "../../../../utils/constants.jsx";
 import { capitalizeFirstLetter } from "../../../../utils/formatters.js";
 
-export function SportDistribution({ fields }) {
-    const sportCounts = fields.reduce((acc, field) => {
-        const sport = field.field_type ? field.field_type.toLowerCase() : "default";
-        acc[sport] = (acc[sport] || 0) + 1
-        return acc;
-    }, {});
+export function SportDistribution({chartData}) {
+    const totalFields = chartData.reduce((acc, curr) => acc + curr.count, 0);
 
     return (
         <Card>
             <CardContent className="content">
                 <h3>Fields by Sport</h3>
                 <div className="sport-list">
-                    {Object.entries(sportCounts).map(([sport, count]) => (
-                        <div key={sport} className="sport-item">
-                            <div className="sport-row">
-                                <div className="sport-name">
-                                    <span className="sport-icon">
-                                        {sportIcons[sport]}
-                                    </span>
-                                    <span>
-                                        {capitalizeFirstLetter(sport)}
+                    {chartData.map((item) => {
+                        const sportName = item.sport.toLowerCase();
+                        return (
+                            <div key={sportName} className="sport-item">
+                                <div className="sport-row">
+                                    <div className="sport-name">
+                                        <span className="sport-icon">
+                                            {sportIcons[sportName] || "🏟️"}
+                                        </span>
+                                        <span>
+                                            {capitalizeFirstLetter(sportName)}
+                                        </span>
+                                    </div>
+
+                                    <span className="sport-count">
+                                        {item.count}
                                     </span>
                                 </div>
 
-                                <span className="sport-count">
-                                    {count}
-                                </span>
+                                <div className="progress">
+                                    <div
+                                        className={`progress-bar ${sportName}`}
+                                        style={{width: `${totalFields ? (item.count / totalFields) * 100 : 0}%`}}
+                                    />
+                                </div>
                             </div>
+                        )
+                    })}
 
-                            <div className="progress">
-                                <div
-                                    className={`progress-bar ${sport}`}
-                                    style={{
-                                        width: `${fields.length ? (count / fields.length) * 100 : 0}%`,
-                                    }}
-                                />
-                            </div>
-                        </div>
-                    ))}
-
-                    {fields.length === 0 && (
+                    {chartData.length === 0 && (
                         <EmptyState text="fields" />
                     )}
                 </div>

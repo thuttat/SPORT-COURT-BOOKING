@@ -1,4 +1,4 @@
-import { Outlet, useNavigate } from "react-router-dom";
+import {Navigate, Outlet, useNavigate} from "react-router-dom";
 import { Button } from "./Button.jsx";
 import {useAuth} from "../../services/auth/useAuth.js";
 
@@ -15,7 +15,7 @@ export function ProtectedRoute() {
                         Requires login
                     </h3>
                     <p className="text-muted" style={{ marginBottom: '24px' }}>
-                        You need to log in to the system to view your booking history and manage your personal profile.
+                        You need to log in to the system to booking sport court, view your booking history and manage your personal profile.
                     </p>
                     <Button
                         className="btn-primary"
@@ -27,6 +27,10 @@ export function ProtectedRoute() {
                 </div>
             </div>
         );
+    }
+
+    if (user.role === "ADMIN") {
+        return <Navigate to="/admin/dashboard" replace />;
     }
 
     return <Outlet />;

@@ -3,17 +3,7 @@ import { Card, CardContent } from "../../../../components/common/Card.jsx";
 import { LayoutGrid, Calendar, TrendingUp, MapPin } from "lucide-react";
 import { isToday } from "date-fns";
 
-export function DashboardStats({ fields, bookings }) {
-    const todayBookings = bookings.filter(
-        (b) => isToday(new Date(b.date)) && b.status !== "cancelled"
-    );
-
-    const activeFields = fields.filter((f) => f.is_active);
-
-    const totalBookings = bookings.filter(
-        (b) => b.status !== "cancelled"
-    ).length;
-
+export function DashboardStats({ summary }) {
     return (
         <div className="stats-grid">
             <Card className="stat-card blue">
@@ -25,7 +15,7 @@ export function DashboardStats({ fields, bookings }) {
                         <TrendingUp size={18} />
                     </div>
 
-                    <div className="stat-value">{fields.length}</div>
+                    <div className="stat-value">{summary.total_fields}</div>
 
                     <div className="stat-label">Total Fields</div>
                 </CardContent>
@@ -40,7 +30,7 @@ export function DashboardStats({ fields, bookings }) {
                         <TrendingUp size={18} />
                     </div>
 
-                    <div className="stat-value">{activeFields.length}</div>
+                    <div className="stat-value">{summary.active_fields}</div>
 
                     <div className="stat-label">Active Fields</div>
                 </CardContent>
@@ -55,7 +45,7 @@ export function DashboardStats({ fields, bookings }) {
                         <TrendingUp size={18} />
                     </div>
 
-                    <div className="stat-value">{todayBookings.length}</div>
+                    <div className="stat-value">{summary.bookings_today}</div>
 
                     <div className="stat-label">Bookings Today</div>
                 </CardContent>
@@ -70,7 +60,7 @@ export function DashboardStats({ fields, bookings }) {
                         <TrendingUp size={18} />
                     </div>
 
-                    <div className="stat-value">{totalBookings}</div>
+                    <div className="stat-value">{summary.total_bookings}</div>
 
                     <div className="stat-label">Total Bookings</div>
                 </CardContent>

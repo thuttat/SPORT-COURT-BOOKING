@@ -1,6 +1,6 @@
 import {NavLink, useNavigate} from "react-router-dom";
 import { Button } from "./Button.jsx";
-import {Calendar, House, LayoutDashboard, MapPin, User, UserPen} from "lucide-react";
+import {Calendar, House, LayoutDashboard, MapPin, Settings, User, UserPen} from "lucide-react";
 import "../styles/header.css"
 import {useAuth} from "../../services/auth/useAuth.js";
 
@@ -37,6 +37,9 @@ export function Header() {
                             <NavLink to="/admin/bookings" className={({ isActive }) =>
                                 isActive ? "nav-btn active" : "nav-btn"
                             }><Calendar size={20} strokeWidth={1.75} /> Bookings</NavLink>
+                            <NavLink to="http://localhost:5000/admin/" className={({ isActive }) =>
+                                isActive ? "nav-btn active" : "nav-btn"
+                            }><Settings size={20} strokeWidth={1.75} /> Advanced</NavLink>
                         </>
                     ) : (
                         <>

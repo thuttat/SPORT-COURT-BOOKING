@@ -1,7 +1,7 @@
 import React from "react";
 import { Card, CardContent } from "../../../../components/common/Card.jsx";
 import { EmptyState } from "../../../../components/common/EmptyState.jsx";
-import { sportIcons } from "../../../../utils/constants.jsx";
+import {renderStatusBadge, sportIcons} from "../../../../utils/constants.jsx";
 import { formatDate } from "../../../../utils/formatters.js";
 
 export function RecentBookings({ bookings }) {
@@ -14,19 +14,15 @@ export function RecentBookings({ bookings }) {
                     {bookings.length === 0 ? (
                         <EmptyState text="bookings" />
                     ) : (
-                        bookings.slice(0, 5).map((booking) => (
+                        bookings.map((booking) => (
                             <div key={booking.id} className="recent-item">
-                                <div className={`recent-icon ${booking.sport}`}>
-                                    {sportIcons[booking.sport]}
-                                </div>
-
                                 <div className="recent-info">
-                                    <p>{booking.fieldName}</p>
-                                    <span>{formatDate(booking.date)}</span>
+                                    <p>{booking.field_name}</p>
+                                    <span>{formatDate(booking.booking_date)} • 🕒 {booking.time_slot}</span>
                                 </div>
 
-                                <div className="recent-time">
-                                    {booking.timeSlots.length}h
+                                <div>
+                                    {renderStatusBadge(booking.status)}
                                 </div>
                             </div>
                         ))
