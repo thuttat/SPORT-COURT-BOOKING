@@ -124,3 +124,9 @@
     color: var(--foreground);
     text-align: right;
 }
+
+.total-price {
+    font-weight: 600;
+    font-size: 18px;
+    color: var(--primary);
+}

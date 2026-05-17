@@ -4,7 +4,7 @@ import {
     getAllFieldsRequest,
     getFieldDetailRequest,
     getFieldSlotsRequest,
-    getMyFieldsRequest, updateFieldRequest
+    getAdminFieldsRequest, updateFieldRequest
 } from "../apis.js";
 import {FieldContext} from "./fieldContext.js";
 
@@ -69,7 +69,7 @@ export function FieldProvider({ children }) {
             let page = 1;
             let hasNext = true;
             while (hasNext) {
-                const response = await getMyFieldsRequest(page);
+                const response = await getAdminFieldsRequest(page);
                 allData = [...allData, ...response.data.data];
                 hasNext = response.data.pagination.has_next;
                 page++;

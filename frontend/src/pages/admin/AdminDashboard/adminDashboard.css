@@ -118,15 +118,6 @@
     background: var(--secondary);
 }
 
-.recent-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
 .recent-info {
     flex: 1;
     margin-left: 12px;
@@ -138,11 +129,6 @@
 }
 
 .recent-info span {
-    font-size: 12px;
-    color: #64748b;
-}
-
-.recent-time {
     font-size: 13px;
     color: #64748b;
 }

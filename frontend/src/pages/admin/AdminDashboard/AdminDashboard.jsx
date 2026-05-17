@@ -4,38 +4,40 @@ import { PageHeader } from "../../../components/common/PageHeader.jsx";
 import { DashboardStats } from "./components/DashboardStats.jsx";
 import { SportDistribution } from "./components/SportDistribution.jsx";
 import { RecentBookings } from "./components/RecentBookings.jsx";
-import {getMyFieldsRequest} from "../../../services/apis.js";
+import {
+    getChartSportRequest,
+    getDashboardSummaryRequest,
+    getRecentBookingsRequest
+} from "../../../services/apis.js";
 
 export function AdminDashboard() {
-    const [fields, setFields] = useState([]);
-    const [loadingFields, setLoadingFields] = useState(true);
-    const bookings = [];
+    const [summary, setSummary] = useState(null);
+    const [chartData, setChartData] = useState([]);
+    const [recentBookings, setRecentBookings] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
-                let allFields = [];
-                let page = 1;
-                let hasNext = true;
+                const [summaryRes, chartRes, recentRes] = await Promise.all([
+                    getDashboardSummaryRequest(),
+                    getChartSportRequest(),
+                    getRecentBookingsRequest()
+                ]);
 
-                while (hasNext) {
-                    const fieldsResponse = await getMyFieldsRequest(page);
-                    allFields = [...allFields, ...fieldsResponse.data.data];
-                    hasNext = fieldsResponse.data.pagination.has_next;
-                    page++;
-                }
-
-                setFields(allFields);
+                setSummary(summaryRes.data.data);
+                setChartData(chartRes.data.data);
+                setRecentBookings(recentRes.data.data);
             } catch (error) {
-                console.error("Error fetching fields: ", error);
+                console.error("Error fetching dashboard data: ", error);
             } finally {
-                setLoadingFields(false);
+                setLoading(false);
             }
         };
         fetchDashboardData();
     }, []);
 
-    if (loadingFields) {
+    if (loading || !summary) {
         return <div className="admin-container loading">Loading...</div>;
     }
 
@@ -44,15 +46,12 @@ export function AdminDashboard() {
             <div className="admin-wrapper">
                 <PageHeader header="Admin Dashboard" text="Overview of your sports booking system"/>
 
-                <DashboardStats
-                    fields={fields}
-                    bookings={bookings}
-                />
+                <DashboardStats summary={summary} />
 
                 <div className="dashboard-grid">
-                    <SportDistribution fields={fields}/>
+                    <SportDistribution chartData={chartData} />
 
-                    <RecentBookings bookings={bookings}/>
+                    <RecentBookings bookings={recentBookings} />
                 </div>
             </div>
         </div>

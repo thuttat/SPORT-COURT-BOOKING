@@ -120,6 +120,7 @@ export function CourtManagement() {
                 <div className="management-tabs">
                     {SPORTS_TABS.map(sport => (
                         <Button
+                            key={sport}
                             className={`tab-btn ${activeSport === sport ? "active" : ""}`}
                             onClick={() => setActiveSport(sport)}
                         >

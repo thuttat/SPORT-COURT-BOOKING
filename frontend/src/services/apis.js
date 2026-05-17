@@ -33,8 +33,13 @@ export const endpoints = {
     fields: "/fields",
     fieldDetail: (id) => `/fields/${id}`,
     fieldSlots: (id) => `/fields/${id}/slots`,
-    myFields: "/my-fields",
-    fieldAction: (id) => `/fields/${id}`,
+    adminFields: "/admin/fields",
+    adminFieldAction: (id) => `/admin/fields/${id}`,
+    adminBookings:  "/admin/bookings",
+    updateBookingStatus: (id) => `/admin/bookings/${id}/status`,
+    dashboardSummary: "/admin/dashboard/summary",
+    dashboardChartSport: "/admin/dashboard/chart-sport",
+    dashboardRecentBookings: "/admin/dashboard/recent-bookings",
 };
 
 export const loginRequest = (username, password) => {
@@ -100,29 +105,49 @@ export const getFieldSlotsRequest = (fieldId, date) => {
     return api.get(endpoints.fieldSlots(fieldId), { params: { date } });
 };
 
-export const getMyFieldsRequest = (page = 1) => {
-    return api.get(endpoints.myFields, {
+export const getAdminFieldsRequest = (page = 1) => {
+    return api.get(endpoints.adminFields, {
         params: {page, page_size: 100},
         withCredentials: true
     });
 };
 
 export const createFieldRequest = (formData) => {
-    return api.post(endpoints.fields, formData, {
+    return api.post(endpoints.adminFields, formData, {
         withCredentials: true
     });
 };
 
 export const updateFieldRequest = (id, formData) => {
-    return api.patch(endpoints.fieldAction(id), formData, {
+    return api.patch(endpoints.adminFieldAction(id), formData, {
         withCredentials: true
     });
 };
 
 export const deleteFieldRequest = (id) => {
-    return api.delete(endpoints.fieldAction(id), {
+    return api.delete(endpoints.adminFieldAction(id), {
         withCredentials: true
     });
+};
+
+export const getAdminBookingsRequest = (page = 1, status = "") => {
+    return api.get(endpoints.adminBookings, { params: { page, status } });
+};
+
+export const updateBookingStatusRequest = (id, status) => {
+    return api.patch(endpoints.updateBookingStatus(id), { status });
+};
+
+export const getDashboardSummaryRequest = () => {
+    return api.get(endpoints.dashboardSummary);
+};
+
+export const getChartSportRequest = () => {
+    return api.get(endpoints.dashboardChartSport);
+};
+
+export const getRecentBookingsRequest = () => {
+    return api.get(endpoints.dashboardRecentBookings);
 };
 
 export default api;

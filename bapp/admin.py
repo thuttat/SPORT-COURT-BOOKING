@@ -1,30 +1,6 @@
 from flask_admin import Admin, BaseView, expose
 from flask_admin.contrib.sqla import ModelView
-from flask_login import current_user
 from werkzeug.utils import redirect
-from bapp import app, db
-from bapp.models import UserRole, Service
-
-
-class AdminView(ModelView):
-    def is_accessible(self):
-        return current_user.is_authenticated and current_user.user_role == UserRole.ADMIN
-
-    def inaccessible_callback(self, name, **kwargs):
-        return redirect('http://localhost:5173/login')
-
-class ServiceView(AdminView):
-    column_list = ['id', 'name', 'price', 'unit', 'is_active']
-    column_searchable_list = ['name']
-    column_filters = ['name', 'price', 'unit']
-    column_editable_list = ['name', 'price', 'unit', 'is_active']
-    form_columns = ['id', 'name', 'price', 'unit', 'is_active']
-    can_create = True
-
-admin = Admin(app=app, name='Advanced system', url='/admin')
-
-admin.add_view(ServiceView(Service, db.session, name='Service', endpoint='service'))
-# =======
 
 from datetime import datetime
 
@@ -34,9 +10,9 @@ from flask import  Blueprint, jsonify, request, current_app
 from flask_login import current_user, login_required
 from sqlalchemy import func
 
-from bapp import dao, db
+from bapp import dao, db, app
 from bapp.decorators import admin_only
-from bapp.models import Field, FieldType, UserRole, Booking, BookingStatus 
+from bapp.models import Field, FieldType, UserRole, Booking, BookingStatus, Service
 
 admin_bp = Blueprint('admin_api', __name__, url_prefix='/api/admin')
 
@@ -280,6 +256,7 @@ def get_bookings():
                 "customer_name": b.user.fullname if b.user else "Unknown",
                 "customer_email": b.user.email if b.user else "", 
                 "field_name": b.field.name,
+                "field_type": b.field.field_type.name,
                 "booking_date": b.booking_date.strftime("%Y-%m-%d"),
                 "time_slot": b.time_slot.name,
                 "duration": b.duration,
@@ -437,3 +414,24 @@ def get_recent_bookings():
         }), 200
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
+
+
+# =============ADMIN SITE===============
+class AdminView(ModelView):
+    def is_accessible(self):
+        return current_user.is_authenticated and current_user.user_role == UserRole.ADMIN
+
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect('http://localhost:5173/login')
+
+class ServiceView(AdminView):
+    column_list = ['id', 'name', 'price', 'unit', 'is_active']
+    column_searchable_list = ['name']
+    column_filters = ['name', 'price', 'unit']
+    column_editable_list = ['name', 'price', 'unit', 'is_active']
+    form_columns = ['id', 'name', 'price', 'unit', 'is_active']
+    can_create = True
+
+admin = Admin(app=app, name='Advanced system', url='/admin')
+
+admin.add_view(ServiceView(Service, db.session, name='Service', endpoint='service'))
