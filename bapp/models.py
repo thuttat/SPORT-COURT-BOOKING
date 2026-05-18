@@ -35,6 +35,7 @@ class BaseModel(db.Model):
     id = Column(Integer, autoincrement=True, primary_key=True)
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.now)
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
 
 class User(BaseModel,UserMixin):
     __tablename__ = 'user'
