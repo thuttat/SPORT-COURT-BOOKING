@@ -107,6 +107,22 @@ export function CourtManagement() {
         }
     };
 
+    const handleToggleStatus = async (field) => {
+        const actionText = field.is_active ? "deactivate" : "activate";
+        if (window.confirm(`Are you sure you want to ${actionText} this court?`)) {
+            try {
+                const payload = new FormData();
+                payload.append("is_active", (!field.is_active).toString());
+
+                await editField(field.id, payload);
+                alert(`Court ${actionText} successfully!`);
+                fetchMyFields();
+            } catch (error) {
+                alert(`Error: ${error.response?.data?.message}`);
+            }
+        }
+    };
+
     return (
         <div className="field-management-container">
             <div className="field-management-wrapper">
@@ -148,6 +164,7 @@ export function CourtManagement() {
                     onPageChange={(page) => setCurrentPage(page)}
                     onEditClick={handleEditClick}
                     onDeleteClick={handleDeleteClick}
+                    onToggleClick={handleToggleStatus}
                 />
             </div>
         </div>

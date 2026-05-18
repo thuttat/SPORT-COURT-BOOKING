@@ -4,11 +4,11 @@ import { Button } from "../../../../components/common/Button.jsx";
 import { Badge } from "../../../../components/common/Badge.jsx";
 import { EmptyState } from "../../../../components/common/EmptyState.jsx";
 import { Pagination } from "../../../../components/common/Pagination.jsx";
-import { Edit2, Trash2 } from "lucide-react";
+import {CheckCircle, Edit2, Trash2} from "lucide-react";
 import { capitalizeFirstLetter, formatCurrency } from "../../../../utils/formatters.js";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "../../../../components/common/Table.jsx";
 
-export function FieldTable({ loading, fields, currentPage, totalPages, onPageChange, onEditClick, onDeleteClick}) {
+export function FieldTable({ loading, fields, currentPage, totalPages, onPageChange, onEditClick, onDeleteClick, onToggleClick }) {
     return (
         <Card>
             {loading ? (
@@ -73,9 +73,22 @@ export function FieldTable({ loading, fields, currentPage, totalPages, onPageCha
                                                     <Button size="sm" className="btn-outline" onClick={() => onEditClick(field)}>
                                                         <Edit2 size={16} />
                                                     </Button>
-                                                    {field.is_active && (
-                                                        <Button size="sm" className="btn-outline" onClick={() => onDeleteClick(field.id)}>
-                                                            <Trash2 size={16} className="delete-icon" />
+
+                                                    {field.is_active ? (
+                                                        <Button
+                                                            size="sm"
+                                                            className="btn-outline"
+                                                            onClick={() => onDeleteClick(field.id)}
+                                                        >
+                                                            <Trash2 size={16} color="#ef4444" />
+                                                        </Button>
+                                                    ) : (
+                                                        <Button
+                                                            size="sm"
+                                                            className="btn-outline btn-success"
+                                                            onClick={() => onToggleClick(field)}
+                                                        >
+                                                            <CheckCircle size={16} />
                                                         </Button>
                                                     )}
                                                 </div>
