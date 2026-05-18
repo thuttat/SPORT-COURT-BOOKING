@@ -43,3 +43,7 @@ def admin_only(f):
 
 def login_required_custom(f):
     return role_required(UserRole.ADMIN, UserRole.USER)(f)
+
+
+def user_only(f):
+    return role_required(UserRole.USER)(f)

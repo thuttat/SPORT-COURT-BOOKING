@@ -241,3 +241,6 @@ def test_booking_blocked_during_restriction(test_client, mocker, auth_user, mock
     assert data['status'] == "error"
     assert "Your account is temporarily restricted from booking for 24 hours" in data['message']
 
+
+
+# TC_CAN_10: 
