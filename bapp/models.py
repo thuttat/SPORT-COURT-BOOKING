@@ -28,7 +28,6 @@ class BookingStatus(enum.Enum):
 class PaymentMethod(enum.Enum):
     VNPAY = 'VNPAY'
     CASH = 'CASH'
-    MOMO = 'MOMO'
 
 
 class BaseModel(db.Model):
