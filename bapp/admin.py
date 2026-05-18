@@ -145,7 +145,7 @@ def add_new_field():
         )
         return jsonify({
             "status": "success",
-            "message": "System saves the new court successfully",
+            "message": "System successfully creates the new court.",
             "data": {
                 "id": new_f.id,
                 "name": new_f.name,
@@ -274,7 +274,7 @@ def delete_fields(field_id):
 
     return jsonify({
         "status": "success",
-        "message": "Field deleted (inactivated) successfully"
+        "message": "Court deactivated successfully."
     }), 200
 
 
