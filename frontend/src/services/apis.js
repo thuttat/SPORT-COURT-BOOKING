@@ -12,9 +12,12 @@ api.interceptors.response.use(
         return response;
     },
     (error) => {
-        if (error.response && error.response.status === 401) {
+        const originalRequest = error.config;
+
+        if (error.response && error.response.status === 401 && originalRequest.url !== endpoints.me) {
             localStorage.removeItem("accessToken");
             localStorage.removeItem("role");
+            localStorage.removeItem("user");
             alert("Your login session has expired. Please log in again!");
             window.location.href = '/login';
         }
@@ -26,6 +29,8 @@ export const endpoints = {
     login: "/login",
     register: "/register",
     logout: "/logout",
+    me: "/me",
+    updateProfile: "/profile",
     myBookings: "/my-bookings",
     createBooking: "/bookings",
     bookingDetails: (id) => `/my-bookings/${id}`,
@@ -63,6 +68,21 @@ export const registerRequest = (fullname, username, email, password, confirm, av
 export const logoutRequest = () => {
     return api.post(endpoints.logout);
 };
+
+export const getCurrentUserRequest = () => {
+    return api.get(endpoints.me, {
+        withCredentials: true
+    });
+};
+
+export const updateProfileRequest = (formData) => {
+    return api.patch(endpoints.updateProfile, formData, {
+        withCredentials: true,
+        headers: {
+            "Content-Type": "multipart/form-data"
+        }
+    });
+}
 
 export const getMyBookingsRequest = (page = 1) => {
     return api.get(endpoints.myBookings, {

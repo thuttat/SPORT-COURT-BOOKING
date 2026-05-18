@@ -70,7 +70,6 @@ export function Header() {
                             )}
                             <div className="user-info">
                                 <h4>{user ? (user.fullname || user.username) : "Loading..."}</h4>
-                                <span>{user ? user.email : ""}</span>
                             </div>
 
                             <Button className="btn-danger" onClick={handleLogout}>
