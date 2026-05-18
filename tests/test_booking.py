@@ -209,7 +209,7 @@ def test_book_timezone_handling(test_client, auth_user, default_booking_mocks, m
     mocker.patch('bapp.index.dao.get_field_and_slot',
                  return_value=(FakeField(), FakeSlotUTC()))
 
-    tomorrow_vn = (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')
+    tomorrow_vn = (datetime.now() + timedelta(days=2)).strftime('%Y-%m-%d')
     res = test_client.post('/api/bookings', data={
         'field_id': '1', 
         'time_slots_id': '1', 
