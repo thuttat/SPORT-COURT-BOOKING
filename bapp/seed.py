@@ -11,7 +11,7 @@ def create_dummy_data():
 
         user1 = User(
             username='duyadmin',
-            password=generate_password_hash('123456'),
+            password=generate_password_hash('AdminPass123!'),
             fullname='Nguyễn Triệu Duy',
             email='duy@gmail.com',
             user_role=UserRole.ADMIN,
