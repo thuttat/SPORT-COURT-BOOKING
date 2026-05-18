@@ -240,3 +240,14 @@ def test_book_different_court_types(test_client, mocker, auth_user, default_book
 
 #TC_BOOK_16: 
 
+
+#TC_BOOK_17:
+
+
+
+#TC_BOOK_18:
+
+
+
+
+

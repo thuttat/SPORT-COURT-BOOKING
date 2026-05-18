@@ -125,6 +125,25 @@ def test_register_invalid_password_format(test_client, invalid_pass):
     assert "Invalid password format" in res.get_json()['message']
 
 
+# TC_REG_09
+def test_register_file_too_large(test_client):
+    large_file_content = b"0" * (21 * 1024 * 1024)
+    large_file = (BytesIO(large_file_content), 'huge_avatar.png')
+
+    res = test_client.post('/api/register', data={
+        'fullname': 'Test User', 
+        'email': 'test@gmail.com', 
+        'username': 'newuser',
+        'password': 'ValidPass123!', 
+        'confirm': 'ValidPass123!', 
+        'avatar': large_file
+    }, content_type='multipart/form-data')
+
+    assert res.status_code == 400
+    assert "This picture is too big" in res.get_json()['message']
+
+
+#################################################################
 
 # TC_LOG_01
 def test_login_success(test_client, mocker):
@@ -169,7 +188,7 @@ def test_login_nonexistent_username(test_client, mocker):
     assert res.status_code == 400
     assert "Invalid username or password" in res.get_json()['message']
 
-
+######################################################################
 
 # TC_OUT_01
 def test_logout_success(test_client, mocker):

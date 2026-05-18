@@ -13,7 +13,7 @@ from flask_login import login_user, login_required, logout_user, current_user
 from bapp import app, dao, login_manager, db, utils
 from bapp.decorators import admin_only, user_only
 from bapp.models import User, UserRole, BookingStatus, Field, FieldType, Booking
-from bapp.utils import allowed_file
+from bapp.utils import allowed_file, validate_image
 
 from bapp.admin import admin_bp
 from bapp.payments import payment_bp
@@ -191,10 +191,10 @@ def register_user():
     if not re.match(email_pattern, email):
         return jsonify({"status": "error", "message": "Invalid email format!"}), 400
 
-    if avatar and not allowed_file(avatar.filename):
-        return jsonify({
-            "status": "error", 
-            "message": "Invalid file type! Only images (PNG, JPG, JPEG) are allowed!"}), 400
+    if avatar:
+        is_valid, error_msg = validate_image(avatar)
+        if not is_valid:
+            return jsonify({"status": "error", "message": error_msg}), 400
 
     try:
         res = cloudinary.uploader.upload(avatar)

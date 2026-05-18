@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import re
 
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -18,7 +19,42 @@ def auth_user(username, password):
         return user
     return None
 
+def validate_register_input(username, password, fullname, email):    
+    username = username.strip()
+    if len(username) < 5:
+        raise ValueError('Username must be at least 5 characters long!')
+    if len(username) > 50:
+        raise ValueError('Username must not exceed 50 characters!')
+    if not re.match(r'^[a-zA-Z0-9_]+$', username):
+        raise ValueError('Username can only contain letters, numbers, and underscores!')
+
+   
+    if len(password) < 8:
+        raise ValueError('Password must be at least 8 characters long!')
+    if not re.search(r'[0-9]', password):
+        raise ValueError('Password must contain at least one number!')
+    if not re.search(r'[a-z]', password):
+        raise ValueError('Password must contain at least one lowercase letter!')
+    if not re.search(r'[A-Z]', password):
+        raise ValueError('Password must contain at least one uppercase letter!')
+    if not re.search(r'[!@#$%^&*(),.?\":{}|<>]', password):
+        raise ValueError('Password must contain at least one special character!')
+
+    
+    fullname = fullname.strip() if fullname else ''
+    if not fullname or len(fullname) < 2:
+        raise ValueError('Full name must be at least 2 characters!')
+    if len(fullname) > 255:
+        raise ValueError('Full name is too long!')
+
+   
+    email = email.strip() if email else ''
+    email_pattern = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+    if not re.match(email_pattern, email):
+        raise ValueError('Invalid email format!')
+
 def add_user(username, password,fullname,email,avatar,user_role):
+    validate_register_input(username, password, fullname, email)
     password = generate_password_hash(password)
     existing_user=User.query.filter(User.username.__eq__(username.strip())).first()
     existing_email = User.query.filter(User.email.__eq__(email.strip())).first()

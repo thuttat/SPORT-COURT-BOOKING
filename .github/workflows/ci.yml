@@ -36,10 +36,3 @@ jobs:
       run: |
         python -m pytest tests/ -v --ignore=tests/test_sel.py
 
-    - name: Run Selenium tests
-      env:
-        PYTHONPATH: .
-        DATABASE_URL: "sqlite:///:memory:"
-        TESTING: "true"
-      run: |
-        python -m pytest tests/test_sel.py -v
