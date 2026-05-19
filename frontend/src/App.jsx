@@ -13,6 +13,7 @@ import PrivateRoute from "./services/auth/PrivateRoute.jsx";
 import {ProtectedRoute} from "./components/common/ProtectedRoute.jsx";
 import {CourtManagement} from "./pages/admin/CourtManagement/CourtManagement.jsx";
 import {BookingManagement} from "./pages/admin/BookingManagement/BookingManagement.jsx";
+import {PaymentResult} from "./pages/customer/CourtBooking/components/PaymentResult.jsx";
 
 function App() {
     return (
@@ -27,6 +28,7 @@ function App() {
                         <Route path="/bookings" element={<BookingHistory />} />
                         <Route path="/booking/:id" element={<BookingDetails />} />
                         <Route path="/profile" element={<Profile />} />
+                        <Route path="/payment" element={<PaymentResult />} />
                     </Route>
                 </Route>
                 <Route path="/admin" element={

@@ -10,18 +10,20 @@ import "./courtBooking.css";
 import {useField} from "../../../services/field/useField.js";
 import {formatTodayString} from "../../../utils/formatters.js";
 import {createBookingRequest} from "../../../services/apis.js";
+import {useBooking} from "../../../services/booking/useBooking.js";
 
 export function CourtBooking() {
     const navigate = useNavigate();
+    const {submitBooking} = useBooking();
     const { id } = useParams();
     const location = useLocation();
-    const {slots, loadingSlots, fetchFieldSlots, fieldDetail, fetchFieldDetail} = useField();
+    const {fields, slots, loadingSlots, fetchFieldSlots, fieldDetail, fetchFieldDetail} = useField();
     const [selectedDate, setSelectedDate] = useState(location.state?.preselectedDate || formatTodayString());
     const [selectedSlot, setSelectedSlot] = useState(null);
     const [isSubmitted, setIsSubmitted] = useState(false);
-    const {fields} = useField();
     const currentField = fields.find((field) => field.id === parseInt(id));
     const basePrice = currentField?.price_per_hour || 0;
+    const [paymentMethod, setPaymentMethod] = useState("CASH");
 
     useEffect(() => {
         if (id && selectedDate) {
@@ -32,14 +34,17 @@ export function CourtBooking() {
     }, [id, selectedDate]);
 
     const handleConfirmBooking = async () => {
-        if (!selectedSlot) return;
         setIsSubmitted(true);
         try {
-            await createBookingRequest(id, selectedSlot.id, selectedDate);
-            alert("Booking successfully!");
-            navigate("/bookings");
+            const result = await submitBooking(id, selectedSlot.id, selectedDate, paymentMethod);
+            if (result.paymentMethod === "VNPAY" && result.payUrl) {
+                window.location.href = result.payUrl;
+            } else {
+                alert("Booking successfully! Please pay in cash at the court.");
+                navigate("/bookings");
+            }
         } catch (error) {
-            alert(`Error: ${error.response?.data?.message}`);
+            alert(`Error: ${error.message}`);
         } finally {
             setIsSubmitted(false);
         }
@@ -94,6 +99,9 @@ export function CourtBooking() {
                         subTotal={subTotal}
                         totalPrice={totalPrice}
                         onConfirm={handleConfirmBooking}
+                        paymentMethod={paymentMethod}
+                        setPaymentMethod={setPaymentMethod}
+                        isSubmitted={isSubmitted}
                     />
                 </div>
         </div>

@@ -3,7 +3,7 @@ import { Badge } from "../../../../components/common/Badge.jsx";
 import { Button } from "../../../../components/common/Button.jsx";
 import {formatCurrency, formatDate} from "../../../../utils/formatters.js";
 
-export function BookingSummary({ date, selectedSlot, subTotal, totalPrice, className = "", onConfirm }) {
+export function BookingSummary({ date, selectedSlot, subTotal, totalPrice, className = "", onConfirm, paymentMethod, setPaymentMethod, isSubmitted }) {
     return (
         <div className={`summary ${className}`}>
             <Card className="summary-card">
@@ -43,6 +43,28 @@ export function BookingSummary({ date, selectedSlot, subTotal, totalPrice, class
                                 <span style={{ fontWeight: '700', color: '#ef4444', fontSize: '1.1rem' }}>
                                     {formatCurrency(totalPrice)}
                                 </span>
+                            </div>
+
+                            <div style={{ marginTop: '20px', marginBottom: '20px' }}>
+                                <span style={{ fontWeight: '600', display: 'block', marginBottom: '10px', fontSize: '14px' }}>Payment Method</span>
+                                <div style={{ display: 'flex', gap: '10px' }}>
+                                    <Button
+                                        className={paymentMethod === "CASH" ? "btn-primary" : "btn-outline"}
+                                        style={{ flex: 1, padding: '8px' }}
+                                        onClick={() => setPaymentMethod("CASH")}
+                                        disabled={isSubmitted}
+                                    >
+                                        💵 Cash
+                                    </Button>
+                                    <Button
+                                        className={paymentMethod === "VNPAY" ? "btn-primary" : "btn-outline"}
+                                        style={{ flex: 1, padding: '8px' }}
+                                        onClick={() => setPaymentMethod("VNPAY")}
+                                        disabled={isSubmitted}
+                                    >
+                                        💳 VNPay
+                                    </Button>
+                                </div>
                             </div>
                         </>
                     )}

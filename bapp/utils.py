@@ -55,7 +55,7 @@ def generate_vnpay_url(booking, ip_address):
     vnp_TmnCode = "IVN0ZMWM"
     vnp_HashSecret = "DWNZDYT99VTGXXDDMD59VNBGR6ROY5HP"
     vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
-    vnp_Returnurl = "http://127.0.0.1:5000/payment" 
+    vnp_Returnurl = "http://localhost:5173/payment"
     
     inputData = {
         "vnp_Version": "2.1.0",
