@@ -152,7 +152,7 @@ def create_dummy_data():
                             duration=1.5, total_price=150000, status=BookingStatus.PENDING)
         bookings_to_add += [bk_3bk_1, bk_3bk_2, bk_3bk_3]
 
-        # ── TC_BOOK_16: user_2bk đã có đúng 2 booking hôm nay ──
+
         bk_2bk_1 = Booking(user_id=user_2bk.id, field_id=field_fb2.id,
                             time_slots_id=slot_sang_som.id, booking_date=TODAY,
                             duration=1.5, total_price=360000, status=BookingStatus.CONFIRMED)
@@ -355,6 +355,17 @@ def create_dummy_data():
             duration=1.5, total_price=150000, status=BookingStatus.CONFIRMED
         )
         bookings_to_add.append(bk_for_cancel_slot)
+
+        bk_can10_target = Booking(
+            user_id=user_normal.id,
+            field_id=field_fb2.id,
+            time_slots_id=slot_toi.id,
+            booking_date=tomorrow,
+            duration=1.5,
+            total_price=450000,
+            status=BookingStatus.PENDING
+        )
+        bookings_to_add.append(bk_can10_target)
 
         db.session.add_all(bookings_to_add)
         db.session.commit()
