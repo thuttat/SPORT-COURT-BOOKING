@@ -17,6 +17,8 @@ export function AuthProvider({ children }) {
             setUser(userData);
             localStorage.setItem("role", userData.user_role);
             localStorage.setItem("user", JSON.stringify(userData));
+
+            return userData;
         } catch (error) {
             setUser(null);
             localStorage.removeItem("role");
@@ -33,14 +35,9 @@ export function AuthProvider({ children }) {
 
     const login = async (username, password) => {
         try {
-            const response = await loginRequest(username, password);
-            const userData = response.data.data;
-
-            setUser(userData);
+            await loginRequest(username, password);
             localStorage.setItem("accessToken", "flask-session-active");
-            localStorage.setItem("role", userData.role);
-            localStorage.setItem("user", JSON.stringify(userData));
-
+            const userData = await checkAuth();
             return userData;
         } catch (error) {
             const errorMsg = error.response?.data?.message || "Invalid credentials!";

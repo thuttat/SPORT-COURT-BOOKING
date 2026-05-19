@@ -57,9 +57,6 @@ def login_my_user():
         return jsonify({"status": "error", "message": "Please fill out all required fields"}), 400
 
     user = dao.auth_user(username=username, password=password)
-    max_limit = app.config.get('MAX_CANCELLATIONS_PER_WEEK', 3)
-    cancel_count = dao.count_cancellations_by_user(user.id)
-    is_restricted = cancel_count >= max_limit
     if user:
         login_user(user)
         session.permanent = True
@@ -70,11 +67,8 @@ def login_my_user():
                 "id": user.id,
                 "fullname": user.fullname,
                 "username": user.username,
-                "email": user.email,
                 "avatar": user.avatar,
-                "role": user.user_role.name,
-                "cancel_count": cancel_count,
-                "is_restricted": is_restricted
+                "role": user.user_role.name
             }
         }), 200
     return jsonify({"status": "error", "message": "Invalid username or password!"}), 400
