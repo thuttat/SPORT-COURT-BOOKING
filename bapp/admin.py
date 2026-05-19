@@ -12,7 +12,7 @@ from sqlalchemy import func
 
 from bapp import dao, db, app
 from bapp.decorators import admin_only
-from bapp.models import Field, FieldType, UserRole, Booking, BookingStatus,Service
+from bapp.models import Field, FieldType, UserRole, Booking, BookingStatus, Service, TimeSlots, Payment
 from bapp.utils import validate_image
 
 
@@ -531,13 +531,33 @@ class AdminView(ModelView):
         return redirect('http://localhost:5173/login')
 
 class ServiceView(AdminView):
-    column_list = ['id', 'name', 'price', 'unit', 'is_active']
+    column_list = ['id', 'name', 'price', 'unit', 'is_active', 'updated_at']
     column_searchable_list = ['name']
     column_filters = ['name', 'price', 'unit']
     column_editable_list = ['name', 'price', 'unit', 'is_active']
-    form_columns = ['id', 'name', 'price', 'unit', 'is_active']
+    form_columns = ['name', 'price', 'unit', 'is_active']
     can_create = True
+    can_delete = False
+
+class TimeSlotsView(AdminView):
+    column_list = ['id', 'name', 'start_time', 'end_time', 'price_multiplier', 'is_active', 'updated_at']
+    column_searchable_list = ['name', 'start_time']
+    column_filters = ['name', 'start_time', 'end_time']
+    column_editable_list = ['name', 'start_time', 'end_time', 'price_multiplier', 'is_active']
+    form_columns = ['name', 'start_time', 'end_time', 'price_multiplier', 'is_active']
+    can_create = True
+    can_delete = False
+
+class PaymentView(AdminView):
+    column_list = ['id', 'booking_id', 'amount', 'payment_method', 'payment_time', 'updated_at']
+    column_searchable_list = ['id', 'booking_id']
+    column_filters = ['booking_id', 'amount', 'payment_method']
+    can_create = False
+    can_edit = False
+    can_delete = False
 
 admin = Admin(app=app, name='Advanced system', url='/admin')
 
+admin.add_view(TimeSlotsView(TimeSlots, db.session, name='Time Slots', endpoint='timeslots'))
 admin.add_view(ServiceView(Service, db.session, name='Service', endpoint='service'))
+admin.add_view(PaymentView(Payment, db.session, name='Payment', endpoint='payment'))

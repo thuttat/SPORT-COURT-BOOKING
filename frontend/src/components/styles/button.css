@@ -54,3 +54,9 @@
     border-bottom: 2px solid var(--primary);
     background: rgba(52, 211, 153, 0.08);
 }
+
+.btn:disabled, button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}

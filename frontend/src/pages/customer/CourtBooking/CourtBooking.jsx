@@ -11,9 +11,12 @@ import {useField} from "../../../services/field/useField.js";
 import {formatTodayString} from "../../../utils/formatters.js";
 import {createBookingRequest} from "../../../services/apis.js";
 import {useBooking} from "../../../services/booking/useBooking.js";
+import {useAuth} from "../../../services/auth/useAuth.js";
+import {AlertCircle} from "lucide-react";
 
 export function CourtBooking() {
     const navigate = useNavigate();
+    const {user} = useAuth();
     const {submitBooking} = useBooking();
     const { id } = useParams();
     const location = useLocation();
@@ -65,6 +68,14 @@ export function CourtBooking() {
 
                     <Card className="date-card">
                         <CardContent className="content">
+                            {user?.is_restricted && (
+                                <div style={{ border: '1px solid #f87171', color: 'var(--destructive)', padding: '16px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                    <AlertCircle size={24} />
+                                    <div>
+                                        <strong>Account is restricted!</strong> If you cancel 3 bookings within the last 7 days, your booking function will be temporarily suspended. Your account will be automatically reactivated after 7 days, starting from the date of the oldest cancellation in the series of violations.
+                                    </div>
+                                </div>
+                            )}
                             <h3>Select Date</h3>
                             <input
                                 type="date"
@@ -102,6 +113,7 @@ export function CourtBooking() {
                         paymentMethod={paymentMethod}
                         setPaymentMethod={setPaymentMethod}
                         isSubmitted={isSubmitted}
+                        isRestricted={user?.is_restricted}
                     />
                 </div>
         </div>

@@ -71,94 +71,123 @@ export function Profile() {
     return (
         <div className="container">
             <PageHeader header="Profile" text="Manage your account and preferences" />
-            <Card className="profile-card">
-                <form onSubmit={handleSubmit}>
-                    <div className="profile-avatar-section">
-                        <div className="profile-avatar-container">
-                            {avatarPreview ? (
-                                <img src={avatarPreview} alt="Avatar" className="profile-avatar-img" />
-                            ) : (
-                                <div className="profile-avatar-placeholder">👤</div>
-                            )}
+
+            <div className="profile-layout">
+                <Card className="profile-card">
+                    <form onSubmit={handleSubmit}>
+                        <div className="profile-avatar-section">
+                            <div className="profile-avatar-container">
+                                {avatarPreview ? (
+                                    <img src={avatarPreview} alt="Avatar" className="profile-avatar-img" />
+                                ) : (
+                                    <div className="profile-avatar-placeholder">👤</div>
+                                )}
+                            </div>
+
+                            <div className="profile-user-info">
+                                <h3 className="profile-username">@{user?.username}</h3>
+                                <div>
+                                    <Badge variant={user?.user_role === "ADMIN" ? "danger" : "primary"}>
+                                        {user?.user_role}
+                                    </Badge>
+                                </div>
+                                <div className="profile-avatar-upload">
+                                    <label className="profile-upload-label">
+                                        <span className="profile-upload-text">Change profile avatar</span>
+                                        <input
+                                            type="file"
+                                            accept="image/png, image/jpeg, image/jpg"
+                                            onChange={handleAvatarChange}
+                                            className="profile-upload-input"
+                                        />
+                                    </label>
+                                </div>
+                            </div>
                         </div>
 
-                        <div className="profile-user-info">
-                            <h3 className="profile-username">@{user?.username}</h3>
+                        <h4 className="profile-section-title">Information</h4>
+                        <div className="profile-info-grid">
                             <div>
-                                <Badge variant={user?.user_role === "ADMIN" ? "danger" : "primary"}>
-                                    {user?.user_role}
-                                </Badge>
+                                <label className="form-label">Full name</label>
+                                <input
+                                    type="text"
+                                    className="input profile-input-field"
+                                    value={formData.fullname}
+                                    onChange={(e) => setFormData({ ...formData, fullname: e.target.value })}
+                                    required
+                                />
                             </div>
-                            <div className="profile-avatar-upload">
-                                <label className="profile-upload-label">
-                                    <span className="profile-upload-text">Change profile avatar</span>
-                                    <input
-                                        type="file"
-                                        accept="image/png, image/jpeg, image/jpg"
-                                        onChange={handleAvatarChange}
-                                        className="profile-upload-input"
-                                    />
-                                </label>
+                            <div>
+                                <label className="form-label">Email</label>
+                                <input
+                                    type="email"
+                                    className="input profile-input-field"
+                                    value={formData.email}
+                                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                    required
+                                />
                             </div>
                         </div>
+
+                        <h4 className="profile-section-title">Change password</h4>
+                        <p className="profile-section-description">Leave this blank if you do not wish to change your current password.</p>
+                        <div className="profile-password-grid">
+                            <div>
+                                <label className="form-label">New password</label>
+                                <input
+                                    type="password"
+                                    className="input profile-input-field"
+                                    placeholder="Enter new password..."
+                                    value={formData.password}
+                                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                />
+                            </div>
+                            <div>
+                                <label className="form-label">Confirm password</label>
+                                <input
+                                    type="password"
+                                    className="input profile-input-field"
+                                    placeholder="Enter confirm password..."
+                                    value={formData.confirmPassword}
+                                    onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="form-actions profile-form-actions">
+                            <Button type="submit" className="btn-primary profile-save-btn" disabled={saving}>
+                                {saving ? "Saving..." : "Save change"}
+                            </Button>
+                        </div>
+                    </form>
+                </Card>
+
+                <Card className="profile-terms-card">
+                    <div style={{ borderBottom: '1px solid var(--border)', paddingBottom: '2px', marginBottom: '-22px' }}>
+                        <h3>📄 Terms & Booking Policies</h3>
                     </div>
 
-                    <h4 className="profile-section-title">Information</h4>
-                    <div className="profile-info-grid">
-                        <div>
-                            <label className="form-label">Full name</label>
-                            <input
-                                type="text"
-                                className="input profile-input-field"
-                                value={formData.fullname}
-                                onChange={(e) => setFormData({ ...formData, fullname: e.target.value })}
-                                required
-                            />
-                        </div>
-                        <div>
-                            <label className="form-label">Email</label>
-                            <input
-                                type="email"
-                                className="input profile-input-field"
-                                value={formData.email}
-                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                required
-                            />
-                        </div>
-                    </div>
+                    <div style={{ fontSize: '14px', lineHeight: '1.8' }}>
+                        <p>By using our system, you agree to comply with the following regulations to ensure fairness for all players:</p>
 
-                    <h4 className="profile-section-title">Change password</h4>
-                    <p className="profile-section-description">Leave this blank if you do not wish to change your current password.</p>
-                    <div className="profile-password-grid">
-                        <div>
-                            <label className="form-label">New password</label>
-                            <input
-                                type="password"
-                                className="input profile-input-field"
-                                placeholder="Enter new password..."
-                                value={formData.password}
-                                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                            />
-                        </div>
-                        <div>
-                            <label className="form-label">Confirm password</label>
-                            <input
-                                type="password"
-                                className="input profile-input-field"
-                                placeholder="Enter confirm password..."
-                                value={formData.confirmPassword}
-                                onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                            />
-                        </div>
+                        <ul>
+                            <li>
+                                <strong>Minimum Duration:</strong> Each court booking must be at least <strong>1 hour</strong> long.
+                            </li>
+                            <li>
+                                <strong>Daily Limit:</strong> A single account can book a maximum of <strong>3 courts per day</strong>.
+                            </li>
+                            <li>
+                                <strong>Cancellation Deadline:</strong> You cannot cancel a booking if the start time is less than <strong>2 hours</strong> away.
+                            </li>
+                            <li className="cancel-rule">
+                                <strong style={{ color: 'var(-destructive)' }}>⚠️ Cancellation Penalty Rule:</strong><br />
+                                If you cancel <strong>three or more bookings within the last seven days (168 hours)</strong>, your account will be temporarily locked from booking. The system will automatically unlock it after <strong>7 days</strong> from the date of the first cancellation in that series of three violations.
+                            </li>
+                        </ul>
                     </div>
-
-                    <div className="form-actions profile-form-actions">
-                        <Button type="submit" className="btn-primary profile-save-btn" disabled={saving}>
-                            {saving ? "Saving..." : "Save change"}
-                        </Button>
-                    </div>
-                </form>
-            </Card>
+                </Card>
+            </div>
         </div>
     );
 }

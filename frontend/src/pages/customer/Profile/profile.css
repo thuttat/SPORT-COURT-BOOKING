@@ -1,6 +1,13 @@
-.profile-card {
-    max-width: 800px;
+.profile-layout {
+    display: grid;
+    grid-template-columns: 1.7fr 1fr;
+    gap: 24px;
+    max-width: 1200px;
     margin: 0 auto;
+    align-items: start;
+}
+
+.profile-card {
     padding: 32px;
 }
 
@@ -106,4 +113,30 @@
 
 .profile-save-btn {
     padding: 12px 32px;
+}
+
+.profile-terms-card {
+    padding: 32px;
+}
+
+@media (max-width: 992px) {
+    .profile-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+.profile-terms-card ul {
+    padding-left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.cancel-rule {
+    background-color: #fef2f2;
+    padding: 12px;
+    border-radius: 6px;
+    border-left: 4px solid #ef4444;
+    list-style-type: none;
+    margin-left: -20px;
 }
