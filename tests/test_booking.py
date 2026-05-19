@@ -1,7 +1,9 @@
 import pytest
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time, timezone
 from bapp.models import UserRole
 from tests.test_base import test_client, test_app, test_session
+
+import pytz
 
 import bapp.index
 
@@ -190,8 +192,35 @@ def test_book_concurrent_race_condition(test_client, mocker, auth_user, default_
     assert res2.status_code == 409
 
 # TC_BOOK_13: Xử lý Timezone 
-def test_book_timezone_handling(test_client, auth_user, default_booking_mocks):
-    future_date = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")
+def test_book_timezone_handling(test_client, auth_user, default_booking_mocks, mocker):  
+    class FakeSlotUTC:
+        id = 1
+        name = "00:30 - 01:30"
+        start_time = datetime.strptime("00:30", "%H:%M").time()
+        end_time   = datetime.strptime("01:30", "%H:%M").time()
+        price_multiplier = 1.0
+
+    class FakeField:
+        id = 1
+        name = "Sân UTC Test"
+        price_per_hour = 100000
+
+    mocker.patch('bapp.index.dao.get_field_and_slot',
+                 return_value=(FakeField(), FakeSlotUTC()))
+
+    tomorrow_vn = (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')
+    res = test_client.post('/api/bookings', data={
+        'field_id': '1', 
+        'time_slots_id': '1', 
+        'booking_date': tomorrow_vn
+    })
+    assert res.status_code == 201, "System must use VN timezone, not UTC"
+
+
+
+# TC_BOOK_14: Sau khi book thành công, slot đó phải trả về is_available=False
+def test_court_status_changes_after_booking(test_client, mocker, auth_user, default_booking_mocks):
+    future_date = (datetime.now() + timedelta(days=2)).strftime("%Y-%m-%d")
     res = test_client.post('/api/bookings', data={
         'field_id': '1', 
         'time_slots_id': '1', 
@@ -199,22 +228,24 @@ def test_book_timezone_handling(test_client, auth_user, default_booking_mocks):
     })
     assert res.status_code == 201
 
-# TC_BOOK_14: Trạng thái sân thay đổi 
-def test_court_status_changes_after_booking(test_client, mocker, auth_user, default_booking_mocks):
-    mocker.patch('bapp.index.dao.is_field_available', side_effect=[True, False])
-    future_date = (datetime.now() + timedelta(days=2)).strftime("%Y-%m-%d")
-    res1 = test_client.post('/api/bookings', data={
-        'field_id': '1', 
-        'time_slots_id': '1', 
-        'booking_date': future_date
-    })
-    res2 = test_client.post('/api/bookings', data={
-        'field_id': '1', 
-        'time_slots_id': '1', 
-        'booking_date': future_date
-    })
-    assert res1.status_code == 201
-    assert res2.status_code == 409
+    class FakeSlot:
+        id = 1
+        name = "Slot Chuẩn"
+        start_time = datetime.strptime("18:00", "%H:%M").time()
+        end_time   = datetime.strptime("19:00", "%H:%M").time()
+        price_multiplier = 1.0
+
+    mocker.patch('bapp.index.dao.get_all_time_slots', return_value=[FakeSlot()])
+    mocker.patch('bapp.index.dao.is_field_available', return_value=False)
+
+    res2 = test_client.get(f'/api/fields/1/slots?date={future_date}')
+    assert res2.status_code == 200
+    slots = res2.get_json()['data']
+    slot = next((s for s in slots if s['id'] == 1), None)
+    assert slot is not None
+    assert slot['is_available'] == False
+
+
 
 # TC_BOOK_15: Đặt nhiều loại sân
 def test_book_different_court_types(test_client, mocker, auth_user, default_booking_mocks, sample_fields):
@@ -237,14 +268,79 @@ def test_book_different_court_types(test_client, mocker, auth_user, default_book
         assert res.status_code == 201
         assert data['data']['field_name'] == field.name
 
-#TC_BOOK_16: 
+#TC_BOOK_16: kiểm tra book sân lần thứ 3 trong ngày thành công?
+def test_booking_3rd_time_success(test_client, auth_user, default_booking_mocks, mocker):
+    mocker.patch('bapp.index.dao.count_user_bookings_per_day', return_value=2)
+    future_date = (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')
+    res = test_client.post('/api/bookings', data={
+        'field_id': '1',
+        'time_slots_id': '1',
+        'booking_date': future_date
+    })
+    data = res.get_json()
+    assert res.status_code == 201
+    assert data['status'] == "success"
+    assert "Booking successful" in data['message']
+
+    mocker.patch('bapp.index.dao.count_user_bookings_per_day', return_value=3)
+    res2 = test_client.post('/api/bookings', data={
+        'field_id': '1', 'time_slots_id': '1', 'booking_date': future_date
+    })
+    assert res2.status_code == 400
+    assert "maximum of 3 courts per day" in res2.get_json()['message']
 
 
-#TC_BOOK_17:
+
+#TC_BOOK_17: đặt sân chính xác tại mốc thời gian ranh giới 00:00
+def test_booking_at_00_00_boundary(test_client, auth_user, default_booking_mocks, mocker):
+    class FakeSlot00:
+        id = 1
+        name = "00:00 - 01:00"
+        start_time = time(0, 0)
+        end_time = time(1, 0)
+        price_multiplier = 1.0
+
+    class FakeField: 
+        id = 1; 
+        name = "Sân Xuyên Đêm"; 
+        price_per_hour = 100000
+
+    mocker.patch('bapp.index.dao.get_field_and_slot', return_value=(FakeField(), FakeSlot00()))
+    tomorrow_date = (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')
+    res = test_client.post('/api/bookings', data={
+        'field_id': '1',
+        'time_slots_id': '1',
+        'booking_date': tomorrow_date
+    })
+    assert res.status_code == 201
+    assert "Booking successful" in res.get_json()['message']
 
 
+#TC_BOOK_18: đặt slot cuối cùng trong ngày (23:00 - 00:00)
+def test_booking_last_slot_of_day(test_client, auth_user, default_booking_mocks, mocker):
+    class FakeSlot23:
+        id = 1
+        name = "23:00 - 23:59"
+        start_time = time(23, 0)   
+        end_time = time(23, 59)    
+        price_multiplier = 1.0
 
-#TC_BOOK_18:
+    class FakeField: 
+        id = 1; 
+        name = "Sân Cú Đêm"; 
+        price_per_hour = 100000
+
+    mocker.patch('bapp.index.dao.get_field_and_slot', return_value=(FakeField(), FakeSlot23()))
+    tomorrow_date = (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')
+    res = test_client.post('/api/bookings', data={
+        'field_id': '1',
+        'time_slots_id': '1',
+        'booking_date': tomorrow_date
+    })
+    data = res.get_json()
+    assert res.status_code == 201
+    assert data['status'] == "success"
+    assert "Booking successful" in data['message']
 
 
 

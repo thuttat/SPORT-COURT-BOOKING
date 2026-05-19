@@ -164,7 +164,7 @@ def test_cancel_unauthorized(test_client, mocker, auth_user, mock_bookings):
 
 
 #TC_CAN_05: Hủy đơn đặt sân (sân đang diễn ra)
-def test_cancel_booking_not_found(test_client, mocker, auth_user, mock_bookings):
+def test_cancel_active_booking(test_client, mocker, auth_user, mock_bookings):
     mocker.patch('bapp.index.dao.get_booking_by_id', return_value=mock_bookings["active"])
     res = test_client.delete('/api/bookings/5')
     data = res.get_json()
@@ -190,13 +190,16 @@ def test_cancel_excessive_limit(test_client, mocker, auth_user, mock_bookings):
 #TC_CAN_07: Sau khi hủy -> slot Available
 def test_cancel_booking_after_slot_available(test_client, mocker, auth_user, mock_bookings):
     mocker.patch('bapp.index.dao.get_booking_by_id', return_value=mock_bookings["valid"])
-    mocker.patch('bapp.index.dao.count_cancellations_by_user', return_value=0)  # ← thêm
+    mocker.patch('bapp.index.dao.count_cancellations_by_user', return_value=0)  
     mocker.patch('bapp.index.dao.update_booking_status', return_value=True)
 
     res = test_client.delete('/api/bookings/1')
     assert res.status_code == 200
 
-    mocker.patch('bapp.index.dao.get_all_time_slots', return_value=[])
+    fake_slot = mock_bookings["mock_slot"]
+    fake_slot.price_multiplier = 1.0
+
+    mocker.patch('bapp.index.dao.get_all_time_slots', return_value=[fake_slot])
     mocker.patch('bapp.index.dao.is_field_available', return_value=True)
 
     res_calendar = test_client.get('/api/fields/1/slots?date=2026-05-15')  
@@ -243,4 +246,37 @@ def test_booking_blocked_during_restriction(test_client, mocker, auth_user, mock
 
 
 
-# TC_CAN_10: 
+# TC_CAN_10: Kiểm tra slot chuyển sang Available sau khi vừa hủy
+def test_cancel_and_rebook_immediately(test_client, auth_user, mock_bookings, mocker):
+    valid_booking = mock_bookings["valid"]
+
+    mocker.patch('bapp.index.dao.get_booking_by_id', return_value=valid_booking)
+    mocker.patch('bapp.index.dao.update_booking_status', return_value=True)
+    mocker.patch('bapp.index.dao.count_cancellations_by_user', return_value=0)
+
+    fake_field = mock_bookings["mock_field"]
+    fake_slot = mock_bookings["mock_slot"]
+    mocker.patch('bapp.index.dao.get_field_and_slot', return_value=(fake_field, fake_slot))
+    mocker.patch('bapp.index.utils.calculate_duration', return_value=1.0)
+    mocker.patch('bapp.index.dao.count_user_bookings_per_day', return_value=0)
+    mocker.patch('bapp.index.dao.is_field_available', return_value=True)
+
+    class FakeNewBooking:
+        id = 100
+        total_price = 100000
+    mocker.patch('bapp.index.dao.create_new_booking', return_value=FakeNewBooking())
+
+    future_date = valid_booking.booking_date.strftime('%Y-%m-%d')
+
+    res_cancel = test_client.delete(f'/api/bookings/{valid_booking.id}')
+    res_book = test_client.post('/api/bookings', data={
+        'field_id': '1',
+        'time_slots_id': '1',
+        'booking_date': future_date
+    })
+
+    assert res_cancel.status_code == 200
+    assert "Booking canceled successfully" in res_cancel.get_json()['message']
+    
+    assert res_book.status_code == 201
+    assert "Booking successful" in res_book.get_json()['message']
