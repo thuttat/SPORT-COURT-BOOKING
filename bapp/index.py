@@ -385,7 +385,7 @@ def cancel_booking(booking_id):
         return jsonify({
             "status": "error",
             "message": "Cannot cancel a court that is currently in use"}), 400
-    if minutes_diff <= 120:
+    if minutes_diff < 120:
         return jsonify({
             "status": "error",
             "message": "Cannot cancel a booking less than 2 hours before start time"}), 400
