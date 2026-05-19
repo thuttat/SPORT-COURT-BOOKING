@@ -146,7 +146,7 @@ def count_cancellations_by_user(user_id):
     count = Booking.query.filter(
         Booking.user_id == user_id,
         Booking.status == BookingStatus.CANCELLED,
-        Booking.created_at >= seven_days_ago
+        Booking.updated_at >= seven_days_ago
     ).count()
     return count
 

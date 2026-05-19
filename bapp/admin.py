@@ -12,8 +12,9 @@ from sqlalchemy import func
 
 from bapp import dao, db, app
 from bapp.decorators import admin_only
-from bapp.models import Field, FieldType, UserRole, Booking, BookingStatus, Service
-from bapp.utils import validate_image 
+from bapp.models import Field, FieldType, UserRole, Booking, BookingStatus,Service
+from bapp.utils import validate_image
+
 
 admin_bp = Blueprint('admin_api', __name__, url_prefix='/api/admin')
 
