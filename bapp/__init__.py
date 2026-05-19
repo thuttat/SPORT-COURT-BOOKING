@@ -25,7 +25,6 @@ app.config['SQLALCHEMY_ECHO'] = False
 app.config['PAGE_SIZE']=5
 app.config['MAX_CANCELLATIONS_PER_WEEK'] = 3
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
-
 app.config['MAX_CONTENT_LENGTH'] = 25 * 1024 * 1024
 swagger = Swagger(app, template_file='swagger.yml')
 
@@ -44,5 +43,3 @@ def file_too_large(e):
         "status": "error",
         "message": "File is too large! Maximum allowed size is 25MB."
     }), 413
-
-

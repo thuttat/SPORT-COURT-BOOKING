@@ -1,12 +1,35 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {AuthContext} from "./authContext.js";
-import {loginRequest, logoutRequest, registerRequest} from "../apis.js";
+import {getCurrentUserRequest, loginRequest, logoutRequest, registerRequest, updateProfileRequest} from "../apis.js";
 
 export function AuthProvider({ children }) {
+    const [loading, setLoading] = useState(true);
     const [user, setUser] = useState(() => {
         const savedUser = localStorage.getItem("user");
         return savedUser ? JSON.parse(savedUser) : null;
     });
+
+    const checkAuth = async () => {
+        try {
+            const res = await getCurrentUserRequest();
+            const userData = res.data.data;
+
+            setUser(userData);
+            localStorage.setItem("role", userData.user_role);
+            localStorage.setItem("user", JSON.stringify(userData));
+        } catch (error) {
+            setUser(null);
+            localStorage.removeItem("role");
+            localStorage.removeItem("user");
+            localStorage.removeItem("accessToken");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        checkAuth();
+    }, []);
 
     const login = async (username, password) => {
         try {
@@ -47,16 +70,33 @@ export function AuthProvider({ children }) {
         localStorage.removeItem("user");
     };
 
-    const isAdmin = user?.role === "ADMIN";
+    const updateProfile = async (formData) => {
+        try {
+            const response = await updateProfileRequest(formData);
+            const updatedData = response.data.data;
+            setUser(updatedData);
+            localStorage.setItem("role", updatedData.user_role);
+            localStorage.setItem("user", JSON.stringify(updatedData));
+
+            return updatedData;
+        } catch (error) {
+            throw error;
+        }
+    };
+
+    const isAdmin = user?.role === "ADMIN" || user?.user_role === "ADMIN";
 
     return (
         <AuthContext.Provider
             value={{
                 user,
+                loading,
                 login,
                 register,
                 logout,
-                isAdmin
+                isAdmin,
+                updateProfile,
+                refreshUser: checkAuth,
             }}
         >
             {children}
