@@ -208,7 +208,7 @@ def test_book_timezone_handling(test_client, auth_user, default_booking_mocks, m
     mocker.patch('bapp.index.dao.get_field_and_slot',
                  return_value=(FakeField(), FakeSlotUTC()))
 
-    tomorrow_vn = (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')
+    tomorrow_vn = (datetime.now() + timedelta(days=2)).strftime('%Y-%m-%d')
     res = test_client.post('/api/bookings', data={
         'field_id': '1', 
         'time_slots_id': '1', 
@@ -271,7 +271,7 @@ def test_book_different_court_types(test_client, mocker, auth_user, default_book
 #TC_BOOK_16: kiểm tra book sân lần thứ 3 trong ngày thành công?
 def test_booking_3rd_time_success(test_client, auth_user, default_booking_mocks, mocker):
     mocker.patch('bapp.index.dao.count_user_bookings_per_day', return_value=2)
-    future_date = (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')
+    future_date = (datetime.now() + timedelta(days=2)).strftime('%Y-%m-%d')
     res = test_client.post('/api/bookings', data={
         'field_id': '1',
         'time_slots_id': '1',
@@ -306,7 +306,7 @@ def test_booking_at_00_00_boundary(test_client, auth_user, default_booking_mocks
         price_per_hour = 100000
 
     mocker.patch('bapp.index.dao.get_field_and_slot', return_value=(FakeField(), FakeSlot00()))
-    tomorrow_date = (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')
+    tomorrow_date = (datetime.now() + timedelta(days=2)).strftime('%Y-%m-%d')
     res = test_client.post('/api/bookings', data={
         'field_id': '1',
         'time_slots_id': '1',
@@ -331,7 +331,7 @@ def test_booking_last_slot_of_day(test_client, auth_user, default_booking_mocks,
         price_per_hour = 100000
 
     mocker.patch('bapp.index.dao.get_field_and_slot', return_value=(FakeField(), FakeSlot23()))
-    tomorrow_date = (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')
+    tomorrow_date = (datetime.now() + timedelta(days=2)).strftime('%Y-%m-%d')
     res = test_client.post('/api/bookings', data={
         'field_id': '1',
         'time_slots_id': '1',
