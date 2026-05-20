@@ -6,7 +6,6 @@ from datetime import date, timedelta
 from locust import HttpUser, task, between, constant, events
 from locust.runners import MasterRunner, WorkerRunner
 
-# ── Đọc ảnh thật 1 lần ──────────────────────────────────────────────────────
 _AVATAR_PATH = os.path.join(os.path.dirname(__file__), "asset", "Picture1.jpg")
 with open(_AVATAR_PATH, "rb") as _f:
     _AVATAR_BYTES = _f.read()
