@@ -1,0 +1,30 @@
+$kind: http-request
+name: GET FIELDS {{base_url}}/api/admin/fields?page=1
+url: "{{base_url}}/api/admin/fields?page=1"
+method: GET
+queryParams:
+  - key: page
+    value: "1"
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r
+
+      \r
+
+      pm.test(\"Có fields array\", () => {\r
+
+      \    const body = pm.response.json();\r
+
+      \    pm.expect(body).to.have.property(\"data\");\r
+
+      \    pm.expect(body.data).to.be.an(\"array\");\r
+
+      });\r
+
+      pm.test(\"User thường bị chặn (403)\", () => {\r
+
+      \r
+
+      });"
+    language: text/javascript
+order: 1779283331224

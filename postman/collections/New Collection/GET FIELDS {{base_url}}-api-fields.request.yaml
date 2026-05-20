@@ -1,0 +1,77 @@
+$kind: http-request
+name: GET FIELDS {{base_url}}/api/fields
+url: "{{base_url}}/api/fields"
+method: GET
+scripts:
+  - type: afterResponse
+    code: "const body = pm.response.json();\r
+
+      \r
+
+      pm.test(\"Status 200\", () => {\r
+
+      \    pm.expect(pm.response.code).to.equal(200);\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Status là success\", () => {\r
+
+      \    pm.expect(body.status).to.equal(\"success\");\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Có danh sách sân và pagination\", () => {\r
+
+      \    pm.expect(body).to.have.property(\"data\");\r
+
+      \    pm.expect(body.data).to.be.an(\"array\");\r
+
+      \    pm.expect(body).to.have.property(\"pagination\");\r
+
+      \    pm.expect(body.pagination).to.have.property(\"current_page\");\r
+
+      \    pm.expect(body.pagination).to.have.property(\"total_pages\");\r
+
+      \    pm.expect(body.pagination).to.have.property(\"total_items\");\r
+
+      \    pm.expect(body.pagination).to.have.property(\"has_next\");\r
+
+      \r
+
+      \    if (body.data.length > 0) {\r
+
+      \        pm.collectionVariables.set(\"field_id\", body.data[0].id);\r
+
+      \        console.log(\"Đã lưu field_id =\", body.data[0].id);\r
+
+      \    }\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Mỗi field có đủ các trường\", () => {\r
+
+      \    body.data.forEach(f => {\r
+
+      \        pm.expect(f).to.have.property(\"id\");\r
+
+      \        pm.expect(f).to.have.property(\"name\");\r
+
+      \        pm.expect(f).to.have.property(\"field_type\");\r
+
+      \        pm.expect(f).to.have.property(\"price_per_hour\");\r
+
+      \        pm.expect(f).to.have.property(\"image\");\r
+
+      \        pm.expect(f.field_type).to.be.oneOf([\"FOOTBALL\", \"BADMINTON\", \"TENNIS\"]);\r
+
+      \    });\r
+
+      });"
+    language: text/javascript
+order: 1779279191391

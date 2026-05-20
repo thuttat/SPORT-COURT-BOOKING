@@ -1,0 +1,35 @@
+$kind: http-request
+name: POST BOOKINGS {{base_url}}/api/bookings
+url: "{{base_url}}/api/bookings"
+method: POST
+body:
+  type: formdata
+  content:
+    - type: text
+      key: field_id
+      value: "1"
+      description: ""
+      disabled: false
+    - type: text
+      key: time_slots_id
+      value: "2"
+      description: ""
+      disabled: false
+    - type: text
+      key: booking_date
+      value: 2026-05-21
+      description: ""
+      disabled: false
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Status 201\", () => pm.response.to.have.status(201));\r
+
+      \r
+
+      pm.test(\"Booking thành công\", () => {\r
+
+      \    pm.expect(pm.response.json().message).to.include(\"Booking successful\");\r
+
+      });"
+    language: text/javascript
+order: 1779281404688

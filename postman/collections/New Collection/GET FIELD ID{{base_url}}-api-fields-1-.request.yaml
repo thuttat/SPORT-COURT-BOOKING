@@ -1,0 +1,53 @@
+$kind: http-request
+name: GET FIELD ID{{base_url}}/api/fields/1/
+url: "{{base_url}}/api/fields/1/"
+method: GET
+scripts:
+  - type: afterResponse
+    code: "const body = pm.response.json();\r
+
+      \r
+
+      pm.test(\"Status 200\", () => {\r
+
+      \    pm.expect(pm.response.code).to.equal(200);\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Status là success\", () => {\r
+
+      \    pm.expect(body.status).to.equal(\"success\");\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Field có đủ các trường\", () => {\r
+
+      \    const data = body.data;\r
+
+      \    pm.expect(data).to.have.property(\"id\");\r
+
+      \    pm.expect(data).to.have.property(\"name\");\r
+
+      \    pm.expect(data).to.have.property(\"field_type\");\r
+
+      \    pm.expect(data).to.have.property(\"price_per_hour\");\r
+
+      \    pm.expect(data).to.have.property(\"is_active\");\r
+
+      \    pm.expect(data).to.have.property(\"image\");\r
+
+      \    pm.expect(data).to.have.property(\"description\");\r
+
+      \    pm.expect(data.field_type).to.be.oneOf([\"FOOTBALL\", \"BADMINTON\", \"TENNIS\"]);\r
+
+      \    pm.expect(data.is_active).to.be.a(\"boolean\");\r
+
+      \    pm.expect(data.price_per_hour).to.be.a(\"number\").and.above(0);\r
+
+      });"
+    language: text/javascript
+order: 2138399172884846

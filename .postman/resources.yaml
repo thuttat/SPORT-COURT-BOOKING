@@ -1,0 +1,15 @@
+# Use this workspace to collaborate
+workspace:
+  id: 98ee3fd7-c9e5-462e-b9a2-991fcd782523
+
+localResources:
+  specs:
+    - ..\bapp\swagger.yml
+
+# Each entry here maps a local resource to one or more corresponding objects in Postman Cloud
+
+cloudResources:
+  specs:
+    ..\bapp\swagger.yml: fc178aa5-4e8e-4356-a419-3727fc11f61d
+  environments:
+    ..\postman\environments\New Environment.environment.yaml: 50181859-d6cad4ba-938b-44d3-bfa3-f4a75fd0c366

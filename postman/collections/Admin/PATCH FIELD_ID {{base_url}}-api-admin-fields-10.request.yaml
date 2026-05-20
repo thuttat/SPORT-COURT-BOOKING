@@ -1,0 +1,25 @@
+$kind: http-request
+name: PATCH FIELD_ID {{base_url}}/api/admin/fields/10
+url: "{{base_url}}/api/admin/fields/10"
+method: PATCH
+body:
+  type: formdata
+  content:
+    - type: text
+      key: name
+      value: edit sân
+      description: ""
+      disabled: false
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r
+
+      \r
+
+      pm.test(\"Court updated successfully\", () => {\r
+
+      \    pm.expect(pm.response.json().message).to.include(\"Court updated successfully\");\r
+
+      });"
+    language: text/javascript
+order: 2169615267130250

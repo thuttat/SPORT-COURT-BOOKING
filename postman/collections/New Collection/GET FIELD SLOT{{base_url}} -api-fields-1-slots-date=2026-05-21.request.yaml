@@ -1,0 +1,64 @@
+$kind: http-request
+name: GET FIELD SLOT{{base_url}} /api/fields/1/slots?date=2026-05-21
+url: "{{base_url}} /api/fields/1/slots?date=2026-05-21"
+method: GET
+queryParams:
+  date: 2026-05-21
+body:
+  type: formdata
+  content: []
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r
+
+      \r
+
+      pm.test(\"Response có data array\", () => {\r
+
+      \    const body = pm.response.json();\r
+
+      \    pm.expect(body).to.have.property(\"data\");\r
+
+      \    pm.expect(body.data).to.be.an(\"array\").and.not.empty;\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Mỗi slot có đủ trường\", () => {\r
+
+      \    pm.response.json().data.forEach(s => {\r
+
+      \        pm.expect(s).to.have.all.keys(\"id\", \"display\", \"duration\", \"is_available\", \"price_multiplier\");\r
+
+      \    });\r
+
+      });\r
+
+      \r
+
+      pm.test(\"price_multiplier > 0 và is_available là boolean\", () => {\r
+
+      \    pm.response.json().data.forEach(s => {\r
+
+      \        pm.expect(s.price_multiplier).to.be.above(0);\r
+
+      \        pm.expect(s.is_available).to.be.a(\"boolean\");\r
+
+      \    });\r
+
+      });\r
+
+      \r
+
+      const freeSlot = pm.response.json().data.find(s => s.is_available);\r
+
+      if (freeSlot) {\r
+
+      \    pm.collectionVariables.set(\"slot_id\", freeSlot.id);\r
+
+      \    console.log(\"Slot trống:\", freeSlot.id, freeSlot.display);\r
+
+      }"
+    language: text/javascript
+order: 4284382722034923

@@ -1,0 +1,45 @@
+$kind: http-request
+name: GET ME {{base_url}}/api/me
+url: "{{base_url}}/api/me"
+method: GET
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r
+
+      \r
+
+      pm.test(\"Có đủ thông tin user\", () => {\r
+
+      \    const data = pm.response.json().data;\r
+
+      \    pm.expect(data).to.have.property(\"id\");\r
+
+      \    pm.expect(data).to.have.property(\"username\");\r
+
+      \    pm.expect(data).to.have.property(\"email\");\r
+
+      \    pm.expect(data).to.have.property(\"fullname\");\r
+
+      \    pm.expect(data).to.have.property(\"avatar\");\r
+
+      \    pm.expect(data).to.have.property(\"user_role\");\r
+
+      \    pm.expect(data.user_role).to.be.oneOf([\"USER\", \"ADMIN\"]);\r
+
+      \r
+
+      \    pm.collectionVariables.set(\"user_id\", data.id);\r
+
+      \    console.log(\"User hiện tại:\", data.username, \"- Role:\", data.user_role);\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Status là success\", () => {\r
+
+      \    pm.expect(pm.response.json().status).to.equal(\"success\");\r
+
+      });"
+    language: text/javascript
+order: 4059721478957982

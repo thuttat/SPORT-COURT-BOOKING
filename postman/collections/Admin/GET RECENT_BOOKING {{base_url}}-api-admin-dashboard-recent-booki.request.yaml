@@ -1,0 +1,21 @@
+$kind: http-request
+name: GET RECENT_BOOKING {{base_url}}/api/admin/dashboard/recent-bookings
+url: "{{base_url}}/api/admin/dashboard/recent-bookings"
+method: GET
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r
+
+      \r
+
+      pm.test(\"Trả về danh sách booking gần đây\", () => {\r
+
+      \    const data = pm.response.json().data;\r
+
+      \    pm.expect(data).to.be.an(\"array\");\r
+
+      \    pm.expect(data.length).to.be.greaterThan(0);\r
+
+      });"
+    language: text/javascript
+order: 4503427358796833
