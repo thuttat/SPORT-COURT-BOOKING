@@ -45,6 +45,8 @@ export const endpoints = {
     dashboardSummary: "/admin/dashboard/summary",
     dashboardChartSport: "/admin/dashboard/chart-sport",
     dashboardRecentBookings: "/admin/dashboard/recent-bookings",
+    createPayment: "payments/create",
+    verifyVnPay: "payments/vnpay/return"
 };
 
 export const loginRequest = (username, password) => {
@@ -169,5 +171,16 @@ export const getChartSportRequest = () => {
 export const getRecentBookingsRequest = () => {
     return api.get(endpoints.dashboardRecentBookings);
 };
+
+export const createPaymentRequest = (bookingId, paymentMethod) => {
+    return api.post(endpoints.createPayment, {
+        booking_id: bookingId,
+        payment_method: paymentMethod
+    });
+};
+
+export const verifyVnPayRequest = (query) => {
+    return api.get(`${endpoints.verifyVnPay}${query}`);
+}
 
 export default api;

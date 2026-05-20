@@ -5,22 +5,32 @@ import {useNavigate} from "react-router-dom";
 import {renderStatusBadge, sportIcons} from "../../../../utils/constants.jsx";
 import {capitalizeFirstLetter, formatCurrency, formatDate} from "../../../../utils/formatters.js";
 import {useBooking} from "../../../../services/booking/useBooking.js";
+import {useAuth} from "../../../../services/auth/useAuth.js";
 
 export function BookingCard({ booking, showCancel }) {
+    const { user, refreshUser } = useAuth();
     const navigate = useNavigate();
     const { cancelBooking, fetchMyBookings, pagination } = useBooking();
     const sport = booking.field_type ? booking.field_type.toLowerCase() : 'default';
 
     const handleCancel = async () => {
-        const isConfirmed = window.confirm("Are you sure you want to cancel this court reservation?");
-        if (isConfirmed) {
-            try {
-                await cancelBooking(booking.id);
-                alert("Cancelled successfully!");
-                fetchMyBookings(pagination?.current_page || 1);
-            } catch (error) {
-                alert(`Error: ${error.message}`);
-            }
+        if (user?.cancel_count === 2) {
+            const warningConfirmed = window.confirm(
+                "WARNING: This is your 3rd cancellation in the last 7 days (168 hours)!\n\nIf you cancel this booking, your account will be RESTRICTED from booking for 7 days starting from the first cancellation in the series of violations. Are you absolutely sure?"
+            );
+            if (!warningConfirmed) return;
+        } else {
+            const isConfirmed = window.confirm("Are you sure you want to cancel this court reservation?");
+            if (!isConfirmed) return;
+        }
+
+        try {
+            await cancelBooking(booking.id);
+            alert("Cancelled successfully!");
+            fetchMyBookings(pagination?.current_page || 1);
+            refreshUser();
+        } catch (error) {
+            alert(`Error: ${error.message}`);
         }
     }
 

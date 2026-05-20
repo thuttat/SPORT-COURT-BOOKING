@@ -2,8 +2,11 @@ import {Card, CardContent} from "../../../../components/common/Card.jsx";
 import { Badge } from "../../../../components/common/Badge.jsx";
 import { Button } from "../../../../components/common/Button.jsx";
 import {formatCurrency, formatDate} from "../../../../utils/formatters.js";
+import {useState} from "react";
 
-export function BookingSummary({ date, selectedSlot, subTotal, totalPrice, className = "", onConfirm }) {
+export function BookingSummary({ date, selectedSlot, subTotal, totalPrice, className = "", onConfirm, paymentMethod, setPaymentMethod, isSubmitted, isRestricted }) {
+    const [isAgreed, setIsAgreed] = useState(false);
+
     return (
         <div className={`summary ${className}`}>
             <Card className="summary-card">
@@ -44,15 +47,51 @@ export function BookingSummary({ date, selectedSlot, subTotal, totalPrice, class
                                     {formatCurrency(totalPrice)}
                                 </span>
                             </div>
+
+                            <div style={{ marginTop: '20px', marginBottom: '20px' }}>
+                                <span style={{ fontWeight: '600', display: 'block', marginBottom: '10px', fontSize: '14px' }}>Payment Method</span>
+                                <div style={{ display: 'flex', gap: '10px' }}>
+                                    <Button
+                                        className={paymentMethod === "CASH" ? "btn-primary" : "btn-outline"}
+                                        style={{ flex: 1, padding: '8px' }}
+                                        onClick={() => setPaymentMethod("CASH")}
+                                        disabled={isSubmitted || isRestricted}
+                                    >
+                                        💵 Cash
+                                    </Button>
+                                    <Button
+                                        className={paymentMethod === "VNPAY" ? "btn-primary" : "btn-outline"}
+                                        style={{ flex: 1, padding: '8px' }}
+                                        onClick={() => setPaymentMethod("VNPAY")}
+                                        disabled={isSubmitted || isRestricted}
+                                    >
+                                        💳 VNPay
+                                    </Button>
+                                </div>
+                            </div>
+
+                            <div style={{ marginBottom: '20px', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                                <input
+                                    type="checkbox"
+                                    id="agreeTerms"
+                                    checked={isAgreed}
+                                    onChange={(e) => setIsAgreed(e.target.checked)}
+                                    disabled={isRestricted}
+                                    style={{ marginTop: '4px', cursor: isRestricted ? 'not-allowed' : 'pointer' }}
+                                />
+                                <label htmlFor="agreeTerms" style={{ fontSize: '13px', color: '#64748b', cursor: isRestricted ? 'not-allowed' : 'pointer', lineHeight: '1.5' }}>
+                                    I have read and agree to the Terms of Service. I understand that if I cancel 3 orders within 7 days, my account will be locked and can only be reopened after 7 days (counting from the first cancellation in the series of violations).
+                                </label>
+                            </div>
                         </>
                     )}
 
                     <Button
                         className="btn-primary btn-full"
-                        disabled={!selectedSlot}
+                        disabled={!selectedSlot || isSubmitted || isRestricted || !isAgreed}
                         onClick={onConfirm}
                     >
-                        Confirm Booking
+                        {isSubmitted ? "Processing..." : "Confirm Booking"}
                     </Button>
                 </CardContent>
             </Card>

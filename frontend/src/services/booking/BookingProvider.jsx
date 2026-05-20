@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { BookingContext } from "./bookingContext";
 import {
-    cancelBookingRequest,
+    cancelBookingRequest, createBookingRequest, createPaymentRequest,
     getAdminBookingsRequest,
     getBookingDetailsRequest,
     getMyBookingsRequest, updateBookingStatusRequest
@@ -86,9 +86,24 @@ export function BookingProvider({ children }) {
         }
     }
 
+    const submitBooking = async (fieldId, timeSlotsId, bookingDate, paymentMethod) => {
+        try {
+            const bookingResponse = await createBookingRequest(fieldId, timeSlotsId, bookingDate);
+            const paymentResponse = await createPaymentRequest(bookingResponse.data.data.booking_id, paymentMethod);
+
+            return {
+                paymentMethod: paymentMethod,
+                payUrl: paymentMethod === "VNPAY" ? paymentResponse.data.data.payUrl : null
+            };
+        } catch (error) {
+            const errorMsg = error.response?.data?.message;
+            throw new Error(errorMsg);
+        }
+    }
+
     return (
         <BookingContext.Provider value={{
-            bookings, loading, fetchMyBookings,
+            bookings, loading, fetchMyBookings, submitBooking,
             bookingDetails, detailLoading, fetchBookingDetails, cancelBooking,
             adminBookings, adminLoading, adminTotalPages, fetchAdminBookings, updateBookingStatus
         }}>

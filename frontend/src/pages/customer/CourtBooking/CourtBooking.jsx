@@ -10,18 +10,23 @@ import "./courtBooking.css";
 import {useField} from "../../../services/field/useField.js";
 import {formatTodayString} from "../../../utils/formatters.js";
 import {createBookingRequest} from "../../../services/apis.js";
+import {useBooking} from "../../../services/booking/useBooking.js";
+import {useAuth} from "../../../services/auth/useAuth.js";
+import {AlertCircle} from "lucide-react";
 
 export function CourtBooking() {
     const navigate = useNavigate();
+    const {user} = useAuth();
+    const {submitBooking} = useBooking();
     const { id } = useParams();
     const location = useLocation();
-    const {slots, loadingSlots, fetchFieldSlots, fieldDetail, fetchFieldDetail} = useField();
+    const {fields, slots, loadingSlots, fetchFieldSlots, fieldDetail, fetchFieldDetail} = useField();
     const [selectedDate, setSelectedDate] = useState(location.state?.preselectedDate || formatTodayString());
     const [selectedSlot, setSelectedSlot] = useState(null);
     const [isSubmitted, setIsSubmitted] = useState(false);
-    const {fields} = useField();
     const currentField = fields.find((field) => field.id === parseInt(id));
     const basePrice = currentField?.price_per_hour || 0;
+    const [paymentMethod, setPaymentMethod] = useState("CASH");
 
     useEffect(() => {
         if (id && selectedDate) {
@@ -32,14 +37,17 @@ export function CourtBooking() {
     }, [id, selectedDate]);
 
     const handleConfirmBooking = async () => {
-        if (!selectedSlot) return;
         setIsSubmitted(true);
         try {
-            await createBookingRequest(id, selectedSlot.id, selectedDate);
-            alert("Booking successfully!");
-            navigate("/bookings");
+            const result = await submitBooking(id, selectedSlot.id, selectedDate, paymentMethod);
+            if (result.paymentMethod === "VNPAY" && result.payUrl) {
+                window.location.href = result.payUrl;
+            } else {
+                alert("Booking successfully! Please pay in cash at the court.");
+                navigate("/bookings");
+            }
         } catch (error) {
-            alert(`Error: ${error.response?.data?.message}`);
+            alert(`Error: ${error.message}`);
         } finally {
             setIsSubmitted(false);
         }
@@ -60,6 +68,14 @@ export function CourtBooking() {
 
                     <Card className="date-card">
                         <CardContent className="content">
+                            {user?.is_restricted && (
+                                <div style={{ border: '1px solid #f87171', color: 'var(--destructive)', padding: '16px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                    <AlertCircle size={24} />
+                                    <div>
+                                        <strong>Account is restricted!</strong> If you cancel 3 bookings within the last 7 days, your booking function will be temporarily suspended. Your account will be automatically reactivated after 7 days, starting from the date of the oldest cancellation in the series of violations.
+                                    </div>
+                                </div>
+                            )}
                             <h3>Select Date</h3>
                             <input
                                 type="date"
@@ -94,6 +110,10 @@ export function CourtBooking() {
                         subTotal={subTotal}
                         totalPrice={totalPrice}
                         onConfirm={handleConfirmBooking}
+                        paymentMethod={paymentMethod}
+                        setPaymentMethod={setPaymentMethod}
+                        isSubmitted={isSubmitted}
+                        isRestricted={user?.is_restricted}
                     />
                 </div>
         </div>
