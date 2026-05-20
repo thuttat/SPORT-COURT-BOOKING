@@ -31,6 +31,14 @@ swagger = Swagger(app, template_file='swagger.yml')
 db = SQLAlchemy(app=app)
 login_manager = LoginManager(app)
 
+@login_manager.unauthorized_handler
+def unauthorized():
+    return jsonify({
+        "status": "error",
+        "message": "Authentication required. Please log in"
+    }), 401 
+
+
 cloudinary.config(cloud_name='dyupzyqwj',
                   api_key='497522642724389',
                   api_secret='1qiLwjHVPTBX9_BYZKsRB2FfWJA')
