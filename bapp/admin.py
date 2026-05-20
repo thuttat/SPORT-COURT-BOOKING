@@ -402,7 +402,7 @@ def update_booking_status(booking_id):
 @admin_bp.route('/bookings/<int:booking_id>', methods=['GET'])
 @login_required
 @admin_only
-def get_admin_booking_detail(booking_id):
+def get_admin_booking_detail(booking_id): 
     try:
         booking = db.session.get(Booking, booking_id)
         if not booking:

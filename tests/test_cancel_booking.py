@@ -118,7 +118,7 @@ def mock_bookings():
 # TC_CAN_01: Hủy đơn đặt sân thành công (đúng 2h)
 def test_cancel_booking_success(test_client, mocker, auth_user, mock_bookings):
     mocker.patch('bapp.index.dao.get_booking_by_id', return_value=mock_bookings["valid"])
-    mocker.patch('bapp.index.dao.count_cancellations_by_user', return_value=0)
+    mocker.patch('bapp.index.dao.is_user_locked_from_booking', return_value=False)
     mocker.patch('bapp.index.dao.update_booking_status', return_value=True)
     res = test_client.delete('/api/bookings/1')
     data = res.get_json()
@@ -131,7 +131,7 @@ def test_cancel_booking_success(test_client, mocker, auth_user, mock_bookings):
 # TC_CAN_02: Hủy đơn đã đặt sân thành công (2h1')
 def test_cancel_above_boundary_time(test_client, mocker, auth_user, mock_bookings):
     mocker.patch('bapp.index.dao.get_booking_by_id', return_value=mock_bookings["boundary_121"])
-    mocker.patch('bapp.index.dao.count_cancellations_by_user', return_value=0)
+    mocker.patch('bapp.index.dao.is_user_locked_from_booking', return_value=False)
     mocker.patch('bapp.index.dao.update_booking_status', return_value=True)
     res = test_client.delete('/api/bookings/6')
     data = res.get_json()
@@ -177,7 +177,7 @@ def test_cancel_active_booking(test_client, mocker, auth_user, mock_bookings):
 #TC_CAN_06: Hạn chế tài khoản hủy (quá 3 lần/week)
 def test_cancel_excessive_limit(test_client, mocker, auth_user, mock_bookings):
     mocker.patch('bapp.index.dao.get_booking_by_id', return_value=mock_bookings["restricted"])
-    mocker.patch('bapp.index.dao.count_cancellations_by_user', return_value=3)
+    mocker.patch('bapp.index.dao.is_user_locked_from_booking', return_value=True)
     mock_update = mocker.patch('bapp.index.dao.update_booking_status')
     res = test_client.delete('/api/bookings/7')
     data = res.get_json()
@@ -190,7 +190,7 @@ def test_cancel_excessive_limit(test_client, mocker, auth_user, mock_bookings):
 #TC_CAN_07: Sau khi hủy -> slot Available
 def test_cancel_booking_after_slot_available(test_client, mocker, auth_user, mock_bookings):
     mocker.patch('bapp.index.dao.get_booking_by_id', return_value=mock_bookings["valid"])
-    mocker.patch('bapp.index.dao.count_cancellations_by_user', return_value=0)  
+    mocker.patch('bapp.index.dao.is_user_locked_from_booking', return_value=False)
     mocker.patch('bapp.index.dao.update_booking_status', return_value=True)
 
     res = test_client.delete('/api/bookings/1')
@@ -214,7 +214,7 @@ def test_cancel_booking_after_slot_available(test_client, mocker, auth_user, moc
 def test_cancel_third_time_allowed(test_client, mocker, auth_user, mock_bookings):
     mocker.patch('bapp.index.dao.get_booking_by_id', return_value=mock_bookings["valid"])
     mocker.patch('bapp.index.dao.update_booking_status', return_value=True)
-    mocker.patch('bapp.index.dao.count_cancellations_by_user', return_value=2)
+    mocker.patch('bapp.index.dao.is_user_locked_from_booking', return_value=False)
 
     res = test_client.delete('/api/bookings/1')
     data = res.get_json()
@@ -226,7 +226,7 @@ def test_cancel_third_time_allowed(test_client, mocker, auth_user, mock_bookings
 
 #TC_CAN_09
 def test_booking_blocked_during_restriction(test_client, mocker, auth_user, mock_bookings):
-    mocker.patch('bapp.index.dao.count_cancellations_by_user', return_value=4)
+    mocker.patch('bapp.index.dao.is_user_locked_from_booking', return_value=True)
     fake_field = mock_bookings["mock_field"]
     fake_slot = mock_bookings["mock_slot"]
     mocker.patch('bapp.index.dao.get_field_and_slot', return_value=(fake_field, fake_slot))
@@ -252,7 +252,7 @@ def test_cancel_and_rebook_immediately(test_client, auth_user, mock_bookings, mo
 
     mocker.patch('bapp.index.dao.get_booking_by_id', return_value=valid_booking)
     mocker.patch('bapp.index.dao.update_booking_status', return_value=True)
-    mocker.patch('bapp.index.dao.count_cancellations_by_user', return_value=0)
+    mocker.patch('bapp.index.dao.is_user_locked_from_booking', return_value=False)
 
     fake_field = mock_bookings["mock_field"]
     fake_slot = mock_bookings["mock_slot"]

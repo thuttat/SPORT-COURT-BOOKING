@@ -151,6 +151,27 @@ def count_cancellations_by_user(user_id):
     return count
 
 
+
+def is_user_locked_from_booking(user_id):
+    seven_days_ago = datetime.now() - timedelta(days=7)
+
+    recent_cancellations = Booking.query.filter(
+        Booking.user_id == user_id,
+        Booking.status == BookingStatus.CANCELLED,
+        Booking.updated_at >= seven_days_ago
+    ).order_by(Booking.updated_at.desc()).all()
+
+    if len(recent_cancellations) < 3:
+        return False
+        
+    latest_cancel_time = recent_cancellations[0].updated_at
+    twenty_four_hours_ago = datetime.now() - timedelta(hours=24)
+    
+    if latest_cancel_time >= twenty_four_hours_ago:
+        return True
+
+    return False
+
 ##################################################
 
 def get_fields_by_user_paginated(user_id, page=1, page_size=6, include_inactive=False):

@@ -105,7 +105,6 @@ def update_profile():
             user.fullname = new_fullname.strip()
 
         if new_email and new_email != user.email:
-            import re
             email_pattern = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
             if not re.match(email_pattern, new_email):
                 return jsonify({"status": "error", "message": "Invalid email format!"}), 400
@@ -307,9 +306,7 @@ def create_booking():
     try:
         user_id = current_user.id
 
-        max_limit = app.config.get('MAX_CANCELLATIONS_PER_WEEK', 3) 
-        cancellation_count = dao.count_cancellations_by_user(user_id)
-        if cancellation_count >= max_limit:
+        if dao.is_user_locked_from_booking(user_id):
             return jsonify({
                 "status": "error",
                 "message": "Your account is temporarily restricted from booking for 24 hours due to excessive cancellations."
@@ -390,10 +387,8 @@ def cancel_booking(booking_id):
             "status": "error",
             "message": "Cannot cancel a booking less than 2 hours before start time"}), 400
     
-    #them cho tc
-    max_limit = app.config.get('MAX_CANCELLATIONS_PER_WEEK', 3) 
-    cancellation_count = dao.count_cancellations_by_user(current_user.id)
-    if cancellation_count >= max_limit:
+    
+    if dao.is_user_locked_from_booking(current_user.id):
         return jsonify({
             "status": "error",
             "message": "Account restricted from booking for 24 hours due to excessive cancellations."
