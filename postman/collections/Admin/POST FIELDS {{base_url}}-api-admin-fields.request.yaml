@@ -1,0 +1,46 @@
+$kind: http-request
+name: POST FIELDS {{base_url}}/api/admin/fields
+url: "{{base_url}}/api/admin/fields"
+method: POST
+body:
+  type: formdata
+  content:
+    - type: text
+      key: name
+      value: Sân Test Postman 012
+      description: ""
+      disabled: false
+    - type: text
+      key: field_type
+      value: football
+      description: ""
+      disabled: false
+    - type: text
+      key: price_per_hour
+      value: "150000"
+      description: ""
+      disabled: false
+    - type: text
+      key: description
+      value: yedhb
+      description: ""
+      disabled: false
+    - type: file
+      key: image
+      src:
+        - /C:/Users/Tran Phuong Uyen/Pictures/Picture1.jpg
+      description: ""
+      disabled: false
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Status 201\", () => pm.response.to.have.status(201));\r
+
+      \r
+
+      pm.test(\"Tạo sân thành công\", () => {\r
+
+      \    pm.expect(pm.response.json().message).to.include(\"saves the new court successfully\");\r
+
+      });"
+    language: text/javascript
+order: 231935001443458

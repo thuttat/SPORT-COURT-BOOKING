@@ -1,0 +1,28 @@
+$kind: http-request
+name: GET BOOKING {{base_url}}/api/admin/bookings?page=1
+url: "{{base_url}}/api/admin/bookings?page=1"
+method: GET
+queryParams:
+  - key: page
+    value: "1"
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r
+
+      \r
+
+      pm.test(\"Có bookings array và lưu id\", () => {\r
+
+      \    const data = pm.response.json().data;\r
+
+      \    pm.expect(data).to.be.an(\"array\");\r
+
+      \    if (data.length > 0) {\r
+
+      \        pm.collectionVariables.set(\"booking_id\", data[0].id);\r
+
+      \    }\r
+
+      });"
+    language: text/javascript
+order: 4503549011960898

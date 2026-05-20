@@ -1,0 +1,11 @@
+$kind: http-request
+name: GET BOOKING_ID {{base_url}}/api/admin/bookings/1
+url: "{{base_url}}/api/admin/bookings/1"
+method: GET
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r
+
+      \r\n"
+    language: text/javascript
+order: 4502557029739273

@@ -1,0 +1,30 @@
+$kind: http-request
+name: POST LOGOUT {{base_url}}/api/logout
+url: "{{base_url}}/api/logout"
+method: POST
+body:
+  type: json
+  content: ""
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r
+
+      \r
+
+      pm.test(\"Logout thành công\", () => {\r
+
+      \    const body = pm.response.json();\r
+
+      \    pm.expect(body.message).to.satisfy(m =>\r
+
+      \        m.includes(\"Logout successfully\") || m.includes(\"success\")\r
+
+      \    );\r
+
+      \    pm.collectionVariables.set(\"user_role\", \"\");\r
+
+      \    console.log(\"Đã logout\");\r
+
+      });"
+    language: text/javascript
+order: 3929249989986857

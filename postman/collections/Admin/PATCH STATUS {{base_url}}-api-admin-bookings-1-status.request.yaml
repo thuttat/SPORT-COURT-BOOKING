@@ -1,0 +1,30 @@
+$kind: http-request
+name: PATCH STATUS {{base_url}}/api/admin/bookings/1/status
+url: "{{base_url}}/api/admin/bookings/1/status"
+method: PATCH
+body:
+  type: json
+  content: "{\r
+
+    \    \"status\":\"confirmed\"\r
+
+    }"
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r
+
+      \r
+
+      pm.test(\"Cập nhật trạng thái thành công\", () => {\r
+
+      \    const body = pm.response.json();\r
+
+      \    pm.expect(body).to.satisfy(b =>\r
+
+      \        \"message\" in b || \"status\" in b\r
+
+      \    );\r
+
+      });"
+    language: text/javascript
+order: 4503585469459282

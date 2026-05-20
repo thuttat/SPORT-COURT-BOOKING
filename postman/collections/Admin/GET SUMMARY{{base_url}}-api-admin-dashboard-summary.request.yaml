@@ -1,0 +1,25 @@
+$kind: http-request
+name: GET SUMMARY{{base_url}}/api/admin/dashboard/summary
+url: "{{base_url}}/api/admin/dashboard/summary"
+method: GET
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r
+
+      \r
+
+      pm.test(\"Có thống kê tổng quan\", () => {\r
+
+      \    const data = pm.response.json().data;\r
+
+      \    pm.expect(data).to.satisfy(d =>\r
+
+      \        \"active_fields\" in d || \"bookings_today\" in d ||\r
+
+      \        \"total_bookings\" in d || \"total_fields\" in d\r
+
+      \    );\r
+
+      });"
+    language: text/javascript
+order: 4503180762675454

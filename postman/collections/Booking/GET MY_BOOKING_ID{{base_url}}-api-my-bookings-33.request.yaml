@@ -1,0 +1,29 @@
+$kind: http-request
+name: GET MY_BOOKING_ID{{base_url}}/api/my-bookings/33
+url: "{{base_url}}/api/my-bookings/33"
+method: GET
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r
+
+      \r
+
+      pm.test(\"Booking có đủ các trường\", () => {\r
+
+      \    const booking = pm.response.json().data;\r
+
+      \    pm.expect(booking).to.have.property(\"id\");\r
+
+      \    pm.expect(booking).to.have.property(\"field_name\");\r
+
+      \    pm.expect(booking).to.have.property(\"time_slot\");\r
+
+      \    pm.expect(booking).to.have.property(\"booking_date\");\r
+
+      \    pm.expect(booking).to.have.property(\"total_price\");\r
+
+      \    pm.expect(booking).to.have.property(\"status\");\r
+
+      });"
+    language: text/javascript
+order: 669321592986618

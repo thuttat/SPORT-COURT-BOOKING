@@ -1,0 +1,75 @@
+$kind: http-request
+name: POST REGISTTER {{base_url}}/api/register
+url: "{{base_url}}/api/register"
+method: POST
+body:
+  type: formdata
+  content:
+    - type: text
+      key: fullname
+      value: Nguyen Van A
+      description: ""
+      disabled: false
+    - type: text
+      key: username
+      value: nguyenvana
+      description: ""
+      disabled: false
+    - type: text
+      key: email
+      value: nguyenvana@test.com
+      description: ""
+      disabled: false
+    - type: text
+      key: password
+      value: Password123@
+      description: ""
+      disabled: false
+    - type: text
+      key: confirm
+      value: Password123@
+      description: ""
+      disabled: false
+    - type: file
+      key: avatar
+      src:
+        - /C:/Users/Tran Phuong Uyen/Pictures/Picture1.jpg
+      description: ""
+      disabled: false
+scripts:
+  - type: afterResponse
+    code: "var jsonData = pm.response.json();\r
+
+      var code = pm.response.code;\r
+
+      if (code === 201) {\r
+
+      \    pm.test(\"Status code is 201\", function () {\r
+
+      \        pm.response.to.have.status(201);\r
+
+      \    });\r
+
+      } \r
+
+      else if (code === 400) {\r
+
+      \    pm.test(\"Status code is 400\", function () {\r
+
+      \        pm.response.to.have.status(400);\r
+
+      \    });\r
+
+      } \r
+
+      else {\r
+
+      \    pm.test(\"Unexpected status code: \" + code, function () {\r
+
+      \        pm.expect.fail(\"API trả về mã lỗi không mong đợi: \" + code);\r
+
+      \    });\r
+
+      }"
+    language: text/javascript
+order: 1779274973739

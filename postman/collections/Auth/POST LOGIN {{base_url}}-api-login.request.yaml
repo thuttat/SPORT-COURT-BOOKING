@@ -1,0 +1,54 @@
+$kind: http-request
+name: POST LOGIN {{base_url}}/api/login
+url: "{{base_url}}/api/login"
+method: POST
+body:
+  type: formdata
+  content:
+    - type: text
+      key: username
+      value: user_normal
+      description: ""
+      disabled: false
+    - type: text
+      key: password
+      value: User@12345
+      description: ""
+      disabled: false
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r
+
+      \r
+
+      pm.test(\"Login thành công và lưu token từ cookie\", () => {\r
+
+      \    const body = pm.response.json();\r
+
+      \    pm.expect(body.status).to.equal(\"success\");\r
+
+      \    pm.expect(body.data).to.have.property(\"role\");\r
+
+      \    pm.expect(body.data.role).to.equal(\"USER\");\r
+
+      \r
+
+      \    const cookie = pm.cookies.get(\"session\");\r
+
+      \    if (cookie) {\r
+
+      \        pm.collectionVariables.set(\"session_cookie\", cookie);\r
+
+      \        console.log(\"Session cookie đã lưu\");\r
+
+      \    }\r
+
+      \r
+
+      \    pm.collectionVariables.set(\"user_role\", body.data.role);\r
+
+      \    pm.collectionVariables.set(\"user_id\", body.data.id);\r
+
+      });"
+    language: text/javascript
+order: 2928074632809784

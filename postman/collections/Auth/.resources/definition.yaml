@@ -1,0 +1,6 @@
+$kind: collection
+name: Auth
+variables:
+  session_cookie: ""
+  user_role: ""
+  user_id: ""

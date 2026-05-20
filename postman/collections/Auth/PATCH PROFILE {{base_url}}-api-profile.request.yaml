@@ -1,0 +1,61 @@
+$kind: http-request
+name: PATCH PROFILE {{base_url}}/api/profile
+url: "{{base_url}}/api/profile"
+method: PATCH
+body:
+  type: formdata
+  content:
+    - type: text
+      key: fullname
+      value: anhthune
+      description: ""
+      disabled: false
+scripts:
+  - type: afterResponse
+    code: "const body = pm.response.json();\r
+
+      \r
+
+      pm.test(\"Status 200\", () => {\r
+
+      \    pm.expect(pm.response.code).to.equal(200);\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Status là success\", () => {\r
+
+      \    pm.expect(body.status).to.equal(\"success\");\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Cập nhật profile thành công\", () => {\r
+
+      \    pm.expect(body.message).to.include(\"updated successfully\");\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Data trả về đủ thông tin user\", () => {\r
+
+      \    const data = body.data;\r
+
+      \    pm.expect(data).to.have.property(\"id\");\r
+
+      \    pm.expect(data).to.have.property(\"fullname\");\r
+
+      \    pm.expect(data).to.have.property(\"username\");\r
+
+      \    pm.expect(data).to.have.property(\"email\");\r
+
+      \    pm.expect(data).to.have.property(\"avatar\");\r
+
+      \    pm.expect(data).to.have.property(\"user_role\");\r
+
+      });"
+    language: text/javascript
+order: 4248036520262977
