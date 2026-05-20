@@ -11,6 +11,8 @@ from werkzeug.security import generate_password_hash
 
 #TC_INT_01
 def test_TC_INT_01_session_expiration(test_client):
+    for rule in test_client.application.url_map.iter_rules():
+        print(f"Route: {rule.rule} | Methods: {rule.methods}")
     res = test_client.post('/api/bookings')
     assert res.status_code in [302, 401], \
         f"Expect 302 hoặc 401 khi chưa login, nhận: {res.status_code}"
