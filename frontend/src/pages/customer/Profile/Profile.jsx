@@ -182,7 +182,7 @@ export function Profile() {
                             </li>
                             <li className="cancel-rule">
                                 <strong style={{ color: 'var(-destructive)' }}>⚠️ Cancellation Penalty Rule:</strong><br />
-                                If you cancel <strong>three or more bookings within the last seven days (168 hours)</strong>, your account will be temporarily locked from booking. The system will automatically unlock it after <strong>7 days</strong> from the date of the first cancellation in that series of three violations.
+                                If you cancel <strong>3 bookings within a 7-day period</strong>, your account will be temporarily restricted from making new bookings for exactly <strong>24 hours</strong> counting from the exact time of your 3rd cancellation. Please check your schedule carefully before confirming.
                             </li>
                         </ul>
                     </div>

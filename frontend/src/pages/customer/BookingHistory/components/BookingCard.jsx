@@ -16,7 +16,7 @@ export function BookingCard({ booking, showCancel }) {
     const handleCancel = async () => {
         if (user?.cancel_count === 2) {
             const warningConfirmed = window.confirm(
-                "WARNING: This is your 3rd cancellation in the last 7 days (168 hours)!\n\nIf you cancel this booking, your account will be RESTRICTED from booking for 7 days starting from the first cancellation in the series of violations. Are you absolutely sure?"
+                "WARNING: This is your 3rd cancellation within the last 7 days!\n\nIf you cancel this booking, your account will be RESTRICTED from booking new courts for exactly 24 hours.\n\nAre you absolutely sure you want to proceed?"
             );
             if (!warningConfirmed) return;
         } else {
