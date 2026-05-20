@@ -10,7 +10,7 @@ export const useAuth = () => {
     }
 
     const isAuthorized = (requiredRole) => {
-        return context.user && context.user.role === requiredRole;
+        return context.user && (context.user.user_role === requiredRole || context.user.role === requiredRole);
     };
 
     return { ...context, isAuthorized };

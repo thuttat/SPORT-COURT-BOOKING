@@ -29,7 +29,7 @@ export function ProtectedRoute() {
         );
     }
 
-    if (user.role === "ADMIN") {
+    if (user.user_role === "ADMIN" || user.role === "ADMIN") {
         return <Navigate to="/admin/dashboard" replace />;
     }
 
