@@ -78,9 +78,8 @@ def login_my_user():
 @app.route('/api/me', methods=['GET'])
 @login_required
 def get_current_user_info():
-    max_limit = app.config.get('MAX_CANCELLATIONS_PER_WEEK', 3)
     cancel_count = dao.count_cancellations_by_user(current_user.id)
-    is_restricted = cancel_count >= max_limit
+    is_restricted = dao.is_user_locked_from_booking(current_user.id)
 
     return jsonify({
         "status": "success",
