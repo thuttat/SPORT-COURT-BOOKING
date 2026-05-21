@@ -1,11 +1,11 @@
 import pytest
 from datetime import datetime, timedelta
+
+from pytest_mock import mocker
 from bapp.models import UserRole, BookingStatus
 from tests.test_base import test_client, test_app, test_session
 
-# ==========================================
-# FIXTURES (Giả lập phiên đăng nhập)
-# ==========================================
+
 @pytest.fixture
 def auth_admin(mocker):
     class FakeAdmin:
@@ -48,7 +48,7 @@ def test_e2e_booking_and_cancellation_flow(test_client, auth_user, mocker):
     mocker.patch('bapp.index.dao.get_field_and_slot', return_value=(FakeField(), FakeSlot()))
     mocker.patch('bapp.index.dao.is_field_available', return_value=True)
     mocker.patch('bapp.index.dao.count_user_bookings_per_day', return_value=0)
-    mocker.patch('bapp.index.dao.count_cancellations_by_user', return_value=0)
+    mocker.patch('bapp.index.dao.is_user_locked_from_booking', return_value=False)
     mocker.patch('bapp.index.dao.create_new_booking', return_value=FakeNewBooking())
 
     res_book = test_client.post('/api/bookings', data={
@@ -117,7 +117,7 @@ def test_e2e_admin_add_court_then_user_books(test_client, auth_admin, mocker):
     mocker.patch('bapp.index.dao.get_field_and_slot', return_value=(FakeNewField(), FakeSlot()))
     mocker.patch('bapp.index.dao.is_field_available', return_value=True)
     mocker.patch('bapp.index.dao.count_user_bookings_per_day', return_value=0)
-    mocker.patch('bapp.index.dao.count_cancellations_by_user', return_value=0)
+    mocker.patch('bapp.index.dao.is_user_locked_from_booking', return_value=False)
     mocker.patch('bapp.index.dao.create_new_booking', return_value=FakeNewBooking())
 
     future_date = (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')
@@ -148,7 +148,7 @@ def test_e2e_booking_blocked_on_4th_attempt(test_client, auth_user, mocker):
     
     mocker.patch('bapp.index.dao.get_field_and_slot', return_value=(FakeField(), FakeSlot()))
     mocker.patch('bapp.index.dao.is_field_available', return_value=True)
-    mocker.patch('bapp.index.dao.count_cancellations_by_user', return_value=0)
+    mocker.patch('bapp.index.dao.is_user_locked_from_booking', return_value=False)
     mocker.patch('bapp.index.dao.count_user_bookings_per_day', return_value=3)
     
     future_date = (datetime.now() + timedelta(days=2)).strftime("%Y-%m-%d")
