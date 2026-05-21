@@ -37,6 +37,11 @@
     cursor: not-allowed;
 }
 
+.btn-complete {
+    background-color: #3b82f6;
+    color: white;
+}
+
 .tab-btn {
     background: transparent;
     border: none;

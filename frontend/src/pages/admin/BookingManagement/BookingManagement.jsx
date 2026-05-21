@@ -31,6 +31,18 @@ export function BookingManagement() {
         }
     };
 
+    const handleComplete = async (id) => {
+        if(window.confirm("Are you sure you want to mark this booking as completed?")) {
+            try {
+                await updateBookingStatus(id, "COMPLETED");
+                alert("Booking marked as completed successfully!");
+                fetchAdminBookings(currentPage, activeTab);
+            } catch (error) {
+                alert(error.message);
+            }
+        }
+    };
+
     const handleCancel = async (id) => {
         if(window.confirm("Are you sure you want to cancel this court booking? Customer will be notified.")) {
             try {
@@ -68,6 +80,7 @@ export function BookingManagement() {
                         onPageChange={(page) => setCurrentPage(page)}
                         onConfirm={handleConfirm}
                         onCancel={handleCancel}
+                        onComplete={handleComplete}
                         onView={(booking) => setSelectedBooking(booking)}
                     />
                 </Card>

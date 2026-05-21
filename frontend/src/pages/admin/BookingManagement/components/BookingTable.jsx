@@ -3,13 +3,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from ".
 import { EmptyState } from "../../../../components/common/EmptyState.jsx";
 import { Pagination } from "../../../../components/common/Pagination.jsx";
 import { Button } from "../../../../components/common/Button.jsx";
-import { Check, X, Eye } from "lucide-react";
+import {Check, X, Eye, CheckCircle} from "lucide-react";
 import { renderStatusBadge, sportIcons } from "../../../../utils/constants.jsx";
 import { formatCurrency, formatDate, capitalizeFirstLetter } from "../../../../utils/formatters.js";
 
 export function BookingTable({
                                  loading, bookings, currentPage, totalPages,
-                                 onPageChange, onConfirm, onCancel, onView
+                                 onPageChange, onConfirm, onCancel, onComplete, onView
                              }) {
     if (loading) {
         return <div className="loading">Loading...</div>;
@@ -78,17 +78,22 @@ export function BookingTable({
                                 <TableCell>
                                     <div className="table-actions">
                                         {booking.status === "PENDING" && (
-                                            <Button size="sm" className="btn-icon btn-success" onClick={() => onConfirm(booking.id)}>
+                                            <Button className="btn-icon btn-primary" onClick={() => onConfirm(booking.id)}>
                                                 <Check size={16} /> Confirm
                                             </Button>
                                         )}
+                                        {booking.status === "CONFIRMED" && (
+                                            <Button className="btn-icon btn-complete" onClick={() => onComplete(booking.id)}>
+                                                <CheckCircle size={16} /> Complete
+                                            </Button>
+                                        )}
                                         {(booking.status === "PENDING" || booking.status === "CONFIRMED") && (
-                                            <Button size="sm" variant="outline" className="btn-icon btn-danger" onClick={() => onCancel(booking.id)}>
+                                            <Button className="btn-icon btn-danger" onClick={() => onCancel(booking.id)}>
                                                 <X size={16} /> Cancel
                                             </Button>
                                         )}
                                         {(booking.status === "CANCELLED" || booking.status === "COMPLETED") && (
-                                            <Button size="sm" variant="ghost" className="btn-icon" onClick={() => onView(booking)}>
+                                            <Button className="btn-icon btn-outline" onClick={() => onView(booking)}>
                                                 <Eye size={16} /> View
                                             </Button>
                                         )}
