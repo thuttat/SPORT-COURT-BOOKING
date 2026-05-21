@@ -80,7 +80,7 @@ export function BookingSummary({ date, selectedSlot, subTotal, totalPrice, class
                                     style={{ marginTop: '4px', cursor: isRestricted ? 'not-allowed' : 'pointer' }}
                                 />
                                 <label htmlFor="agreeTerms" style={{ fontSize: '13px', color: '#64748b', cursor: isRestricted ? 'not-allowed' : 'pointer', lineHeight: '1.5' }}>
-                                    I have read and agree to the Terms of Service. I understand that if I cancel 3 orders within 7 days, my account will be locked and can only be reopened after 7 days (counting from the first cancellation in the series of violations).
+                                    I have read and agree to the Terms of Service. I understand that canceling 3 bookings within a 7-day period will result in a 24-hour booking restriction.
                                 </label>
                             </div>
                         </>

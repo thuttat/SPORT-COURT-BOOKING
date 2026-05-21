@@ -72,7 +72,7 @@ export function CourtBooking() {
                                 <div style={{ border: '1px solid #f87171', color: 'var(--destructive)', padding: '16px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '12px' }}>
                                     <AlertCircle size={24} />
                                     <div>
-                                        <strong>Account is restricted!</strong> If you cancel 3 bookings within the last 7 days, your booking function will be temporarily suspended. Your account will be automatically reactivated after 7 days, starting from the date of the oldest cancellation in the series of violations.
+                                        <strong>Account is restricted!</strong> You have reached the limit of 3 cancellations within 7 days. Your booking feature is temporarily locked for 24 hours counting from your last cancellation.
                                     </div>
                                 </div>
                             )}
