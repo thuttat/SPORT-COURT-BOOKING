@@ -8,7 +8,15 @@ A React and Flask application for reserving sports courts. Customers choose a co
 
 The booking screen requests availability for the selected court and date. The API checks the reservation, and the customer can review it in booking history. The companion browser suite exercises both successful reservations and cases such as conflicting slots, booking quotas and cancellation restrictions. [Booking UI](frontend/src/pages/customer/CourtBooking) · [API specification](bapp/swagger.yml) · [Selenium suite](https://github.com/thuttat/selenium-sport)
 
-**Trịnh Thị Anh Thư contributed integration tests, API test collections, test fixtures and Locust scenarios.** The integration tests exercise the Flask application directly. The Selenium project drives the React UI through Chrome using page objects. The Locust script models a sequence of requests from registration through booking. [Integration test commit](https://github.com/thuttat/SPORT-COURT-BOOKING/commit/99f40582cc39864b87ec754f88440566a4b757b3) · [API collections](postman) · [Load scenario](locustfile.py) · [Recorded performance results](results)
+The integration tests exercise the Flask application directly. The Selenium project drives the React UI through Chrome using page objects. The Locust script models a sequence of requests from registration through booking. [Integration test commit](https://github.com/thuttat/SPORT-COURT-BOOKING/commit/99f40582cc39864b87ec754f88440566a4b757b3) · [API collections](postman) · [Load scenario](locustfile.py) · [Recorded performance results](results)
+
+## Team contributions
+
+| Contributor | Role and implemented work | Selected commits |
+| --- | --- | --- |
+| Trịnh Thị Anh Thư (`thuttat`) | Test automation and integration. Added Flask integration tests and fixtures, Postman collections, Locust load scenarios and Selenium browser tests with page objects. | [Integration tests](https://github.com/thuttat/SPORT-COURT-BOOKING/commit/99f40582cc39864b87ec754f88440566a4b757b3) · [Load tests](https://github.com/thuttat/SPORT-COURT-BOOKING/commit/181a7bd26675c1451b991f8a9a23c3e837a48dc6) · [Browser tests](https://github.com/thuttat/selenium-sport/commit/580034d77f16d560f5c3b0b20d4faa2344b450be) |
+| Lê Hoàng Bảo Trân (`TranLe05`) | Frontend and API integration. Built the customer profile screen, connected it to the profile API and integrated VNPay into the booking and payment-result screens. | [Customer profile](https://github.com/thuttat/SPORT-COURT-BOOKING/commit/8910aa003c0d29bda99e8c9e030583022a6d15ba) · [Booking and payment UI](https://github.com/thuttat/SPORT-COURT-BOOKING/commit/2d4afbe31c096880feafd96f7ac1c50f31aa2fa8) |
+| Nguyễn Triệu Duy (`duynguyenntd`) | Backend and API testing. Implemented the database schema and booking API, updated cancellation rules and added tests for access restrictions and booking edge cases. | [Schema and booking API](https://github.com/thuttat/SPORT-COURT-BOOKING/commit/6f4063de615a78d5025f478406051dbb68dfdfe6) · [Cancellation rules and tests](https://github.com/thuttat/SPORT-COURT-BOOKING/commit/26dbdf985a0eb2e6f4072efd0161f3e2b4aea72b) · [Security tests](https://github.com/thuttat/SPORT-COURT-BOOKING/commit/5f4d420ea3f1171a579fba9680b0cbb9214add5e) |
 
 ## Run locally
 
