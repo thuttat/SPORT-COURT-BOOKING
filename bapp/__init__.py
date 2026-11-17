@@ -2,7 +2,6 @@ import os
 from datetime import timedelta
 from urllib.parse import quote
 
-import cloudinary
 from flask import Flask, jsonify
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
@@ -39,9 +38,7 @@ def unauthorized():
     }), 401 
 
 
-cloudinary.config(cloud_name='dyupzyqwj',
-                  api_key='497522642724389',
-                  api_secret='1qiLwjHVPTBX9_BYZKsRB2FfWJA')
+# The Cloudinary SDK reads CLOUDINARY_URL from the server environment.
 
 
 
